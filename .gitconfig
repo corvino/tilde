@@ -1,0 +1,31 @@
+[user]
+    name = Nathan Corvino
+    email = corvino@gmail.com
+
+[color]
+    diff = auto
+    status = auto
+    branch = auto
+    interactive = auto
+
+[core]
+    excludesfile = ~/.gitexclude
+    warnambiguousrefs = false
+    editor = emacs
+
+[alias]
+    plog = log --pretty=format:'%h %ae %s' --graph
+
+    diffstat = diff --name-status
+
+    spull = !git-svn fetch && git-svn rebase
+    spush = !git-svn dcommit
+
+    ksdiff = difftool -y -t Kaleidoscope
+    ksshow = !sh -c 'git difftool -y -t Kaleidoscope $1^ $1' -
+
+[difftool "Kaleidoscope"]
+    cmd = ksdiff-wrapper git \"$LOCAL\" \"$REMOTE\"
+
+[mergetool]
+    keepBackup = true

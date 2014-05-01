@@ -1,5 +1,6 @@
 /*
 
+!/.gitconfig
 !/.gitexclude
 !/.gitignore
 
@@ -7,3 +8,7 @@
 !/.bashrc
 
 !/.emacs
+
+!/.elisp
+/.elisp/*
+!/.elisp/update.sh

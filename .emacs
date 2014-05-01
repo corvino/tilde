@@ -1,37 +1,10 @@
 ;; -*- Mode: Emacs-Lisp; comment-column: 62 -*-
 ;; ==========================================================================
 ;;
-;; Nathan Corvino's .emacs File For XEmacs & GNU Emacs
-;; Copyright © 1997-2009  Nathan Corvino
+;; Copyright © 1997-2014  Nathan Corvino
 ;;
 ;;     This file is not a part of XEmacs or GNU Emacs
 ;;
-;;     This program is free software; you can redistribute it and/or modify
-;;     it under the terms of the GNU General Public License as published by
-;;     the Free Software Foundation; either version 2, or (at your option)
-;;     any later version.
-;;
-;;     This program is distributed in the hope that it will be useful, but
-;;     WITHOUT ANY WARRANTY; without even the implied warranty of
-;;     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;;     General Public License for more details.
-;;
-;;     You should have received a copy of the GNU General Public License
-;;     along with this program; see the file COPYING.  If not, write to the
-;;     Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-;;     MA 02111-1307, USA.
-;;
-;; Acknowledgements:
-;;
-;;     Andrew Kensler's has provided much Emacs advice and tutelage, as
-;;     well as some excellent ELisp in his init.el.
-;;
-;; Change Log:
-;;
-
-;; Move the frame to a resonable starting position and size.  Are screens aren't from 1988.
-
-;; Turn off wasteful inteface elements.
 
 (if (and (fboundp 'tool-bar-mode) tool-bar-mode) (tool-bar-mode 0))
 (if (and (fboundp 'scroll-bar-mode) scroll-bar-mode) (scroll-bar-mode nil))
@@ -56,12 +29,8 @@
                 visible-bell t
                 initial-scratch-message nil
                 inhibit-startup-message nil
-                ;;standard-indent 4
-                ;;standard-indent 2
                 standard-indent 4
-                ;;tab-stop-list '(2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60 62 64 66 68 70 72 74 76 78 80 82 84 86 88 90 92))
-                tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92))
-                ;;tab-stop-list '(8 16 32 40 48 56 64 72 80 88))
+                tab-stop-list (number-sequence 4 120 4))
 (setq-default   tab-width 4
                 indent-tabs-mode nil
                 fill-column 72)
@@ -77,6 +46,8 @@
 
 ;; Use \C-z ... for custom key bindings.  That way default emacs
 ;; bindings are still in place.
+
+(global-set-key "\M-o" 'other-window)
 
 (global-set-key "\C-z" nil)
 (global-set-key "\C-zl" 'goto-line)
@@ -103,62 +74,37 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode t))
 
-;; (load (expand-file-name "slimeinit" (expand-file-name ".elisp" (expand-file-name "~"))))
-
-;;(require 'rdebug)
-;;(require 'rails)
-
-;; Autoload additional modes.
-
 ;; Pretty diff mode
-(autoload 'diff-mode- "diff-mode-" "Fancy diff display" t)
+
+(require 'diff-mode-)
 (autoload 'ediff-buffers "ediff" "Intelligent Emacs interface to diff" t)
 (autoload 'ediff-files "ediff" "Intelligent Emacs interface to diff" t)
-(autoload 'ediff-files-remote "ediff"
-  "Intelligent Emacs interface to diff")
+(autoload 'ediff-files-remote "ediff" "Intelligent Emacs interface to diff")
 
-(autoload 'apache-mode "apache-mode" "Major mode for editing Apache configuration files" t)
+;; Apache
 
-;; Map files to modes.
-
-(add-to-list 'auto-mode-alist '("\\.conf$" . apache-mode) t)
-(add-to-list 'auto-mode-alist '("\\.ml[iylp]?$" . caml-mode))
-
-;; OCaml Modes
-
-(autoload 'caml-mode "caml" "Major mode for editing Caml code." t)
-(autoload 'run-caml "inf-caml" "Run an inferior Caml process." t)
-
-(if window-system (require 'caml-font))
-
-;; PHP
-;; http://php-mode.sourceforge.net/
-
-(autoload 'php-mode "php-mode" "Major mode for editing php code." t)
-(add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
-(add-to-list 'auto-mode-alist '("\\.inc$" . php-mode))
+(autoload 'apache-mode "apache-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.htaccess\\'"   . apache-mode))
+(add-to-list 'auto-mode-alist '("httpd\\.conf\\'"  . apache-mode))
+(add-to-list 'auto-mode-alist '("srm\\.conf\\'"    . apache-mode))
+(add-to-list 'auto-mode-alist '("access\\.conf\\'" . apache-mode))
+(add-to-list 'auto-mode-alist '("sites-\\(available\\|enabled\\)/" . apache-mode))
 
 ;; Markdown
-;;http://jblevins.org/projects/markdown-mode/
 
-(autoload 'markdown-mode "markdown-mode"
-   "Major mode for editing Markdown files" t)
+(autoload 'markdown-mode "markdown-mode" "Major mode for editing Markdown files" t)
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+(add-hook 'markdown-mode-hook (lambda () (when buffer-file-name (add-hook 'after-save-hook 'check-parens nil t))))
+(add-hook 'markdown-mode-hook (lambda () (modify-syntax-entry ?\" "\"" markdown-mode-syntax-table)))
+
 ;; Customize modes
 
 (add-hook 'c-mode-common-hook
           (lambda ()
             (setq c-basic-offset 4)))
-
-;; (add-hook 'c++-mode-hook
-;;   '(lamdbda ()
-;;     (c-set-style "Stroustrup")
-;;     (c-toggle-auto-state)))
-
-;; For working with Weblingo files.
-;; We should figure out how to do this on-demand for any buffer.
 
 (add-hook 'html-mode-hook
   '(lambda ()
@@ -186,8 +132,6 @@
 
 (defun kill-other-buffers ()
   "Kill all buffers except the current and unsplit the window."
-  ;; As akensler says, Emacs buffers multiply faster than rabbits.  It
-  ;; should be easy to kill them.
   (interactive)
   (mapc 'kill-buffer (delq (current-buffer) (buffer-list)))   ; Delete other buffers
   (delete-other-windows)                                      ; And then unsplit the current window...
@@ -253,19 +197,8 @@ vi style of % jumping to matching brace."
   (interactive)
   (insert-tab))
 
-(defun rigid-body-c++-mode ()
-  "Stupid 2-space tabs."
-  (interactive)
-  (c-mode)
-  (setq c-basic-offset 2
-        c-indent-level 2
-        standard-indent 2))
-
-(setq auto-mode-alist (cons '(".*/RigidBodies/.*\\.\\(cpp\\|h\\)$" . rigid-body-c++-mode) auto-mode-alist))
-
 (defun linux-c-mode ()
   "All the stuff needed to setup for the linux coding standard."
-  "Whatever you do, don't piss off Linus!"
   (interactive)
   (c-mode)
   (setq c-basic-offset 8
@@ -279,36 +212,3 @@ vi style of % jumping to matching brace."
         tab-width 8))
 
 (setq auto-mode-alist (cons '(".*/linux-msm-2.6.32/.*\\.[ch]$" . linux-c-mode) auto-mode-alist))
-    ;; (add-hook 'c-mode-common-hook
-    ;;           (lambda ()
-    ;;             ;; Add kernel style
-    ;;             (c-add-style
-    ;;              "linux-tabs-only"
-    ;;              '("linux" (c-offsets-alist
-    ;;                         (arglist-cont-nonempty
-    ;;                          c-lineup-gcc-asm-reg
-    ;;                          c-lineup-arglist-tabs-only))))))
-    ;; (add-hook 'c-mode-hook
-    ;;           (lambda ()
-    ;;             (let ((filename (buffer-file-name)))
-    ;;               ;; Enable kernel mode for the appropriate files
-    ;;               (when (and filename
-    ;;                          (string-match (expand-file-name "~/src/linux-trees")
-    ;;                                        filename))
-    ;;                 (c-set-style "linux-tabs-only"))))))
-
-;; (defun linux-c-mode-local
-;;   "Set c mode for Linux kernel on buffer."
-;;   (interactive)
-;;   (make-local-variable 'c-basic-offset)
-;;   (make-local-variable 'indent-tabs-mode)
-;;   (linux-c-mode))
-
-
-;; (defun linux-c-mode ()
-;;   "C mode with adjusted defaults for use with the Linux kernel."
-;;   (interactive)
-;;   (c-mode)
-;;   (c-set-style "K&R")
-;;   (setq c-basic-offset 8)
-;;   (setq-default indent-tabs-mode t))
