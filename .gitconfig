@@ -13,10 +13,15 @@
     warnambiguousrefs = false
     editor = emacs
 
+[push]
+    default = simple
+
 [alias]
     plog = log --pretty=format:'%h %ae %s' --graph
+    tlog = log --date=local --pretty=format:'%h %ae %ad %s' --graph
 
     diffstat = diff --name-status
+    get = remote update
 
     spull = !git-svn fetch && git-svn rebase
     spush = !git-svn dcommit
@@ -24,8 +29,20 @@
     ksdiff = difftool -y -t Kaleidoscope
     ksshow = !sh -c 'git difftool -y -t Kaleidoscope $1^ $1' -
 
-[difftool "Kaleidoscope"]
-    cmd = ksdiff-wrapper git \"$LOCAL\" \"$REMOTE\"
-
 [mergetool]
     keepBackup = true
+
+# Diff/Merge Tools
+
+[difftool "Kaleidoscope"]
+    cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+[mergetool "Kaleidoscope"]
+    cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+    trustexitcode = true
+
+[difftool "sourcetree"]
+    cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+    path =
+[mergetool "sourcetree"]
+    cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+    trustExitCode = true
