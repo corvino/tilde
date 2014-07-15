@@ -2,17 +2,9 @@
 ;; ==========================================================================
 ;;
 ;; Copyright © 1997-2014  Nathan Corvino
-;;
-;;     This file is not a part of XEmacs or GNU Emacs
-;;
 
 (if (and (fboundp 'tool-bar-mode) tool-bar-mode) (tool-bar-mode 0))
 (if (and (fboundp 'scroll-bar-mode) scroll-bar-mode) (scroll-bar-mode nil))
-
-;; Emacs starts small by default.  Position and resize.
-
-(set-frame-position (selected-frame) 0 0)
-(set-frame-size (selected-frame) 169 71)
 
 ;; Set Variables.
 
@@ -33,7 +25,8 @@
                 tab-stop-list (number-sequence 4 120 4))
 (setq-default   tab-width 4
                 indent-tabs-mode nil
-                fill-column 72)
+                fill-column 72
+                show-trailing-whitespace t)
 (if (eql system-type 'darwin)
     (progn
       (setq ns-command-modifier 'meta)
@@ -44,17 +37,26 @@
   (setq show-paren-style 'expression)
   (show-paren-mode))
 
-;; Use \C-z ... for custom key bindings.  That way default emacs
-;; bindings are still in place.
+
+
+;; Bind most frequently used commands to single keys when possible.
 
 (global-set-key "\M-o" 'other-window)
 
+(global-set-key [f1] 'delete-other-windows)
+(global-set-key [f2] 'split-window-vertically)
+(global-set-key [f3] 'split-window-right)
+(global-set-key [f10] 'delete-window)
+
+;; Use \C-z as namespace for custom keybindings.
+
 (global-set-key "\C-z" nil)
 (global-set-key "\C-zl" 'goto-line)
+(global-set-key "\C-zb" 'build-tags)
+(global-set-key "\C-zv" 'visit-tags)
 (global-set-key [?\C-z backspace] 'revert-buffer)
 (global-set-key "\C-z/" 'comment-region)
 (global-set-key "\C-z?" 'uncomment-region)
-(global-set-key [?\C-z tab] 'indent-region)
 (global-set-key "\C-z[" 'decrease-left-margin)
 (global-set-key "\C-z]" 'increase-left-margin)
 (global-set-key "\C-zk" 'compile)
@@ -64,12 +66,9 @@
 
 ;; Key bindings for custom functions.
 
-(define-key global-map [(control ?z) ?t] 'strip-trailing-space)
+(define-key global-map [(control ?z) ?t] 'de-pollinate)
 (define-key global-map [(control ?z) ?p] 'goto-matching-paren)
-(define-key global-map [(control ?z) ?@] 'kill-other-buffers)
-(define-key global-map [(control ?z) ?#] 'kill-all-buffers)
 (define-key global-map [(control ?z) ?o] 'browse-selected-file)
-(define-key global-map [(control ?z) ?m] 'toggle-mini-xemacs)
 
 (fset 'yes-or-no-p 'y-or-n-p)
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode t))
@@ -112,15 +111,16 @@
      (define-key html-mode-map "\C-j" 'insert-newline-and-indent-relative)
      (define-key html-mode-map "\t" 'indent-next-stop)))
 
+(add-hook 'js-mode-hook
+   '(lambda ()
+      (setq js-indent-level 2)))
+
 ;; Custom functions
 
-(defun strip-trailing-space ()
-  "Strip out trailing whitespace from all lines in buffer."
+(defun de-pollinate ()
+  "Trailing whitespace is the polline of code."
   (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (while (re-search-forward "[ \t]+$" nil t)
-      (replace-match "" t t))))
+  (delete-trailing-whitespace nil nil))
 
 (defun goto-matching-paren ()
   "If point is sitting on a parenthetic character, jump to its match."
@@ -129,20 +129,6 @@
         ((progn
            (backward-char 1)
            (looking-at "\\s\)")) (forward-char 1) (backward-list 1))))
-
-(defun kill-other-buffers ()
-  "Kill all buffers except the current and unsplit the window."
-  (interactive)
-  (mapc 'kill-buffer (delq (current-buffer) (buffer-list)))   ; Delete other buffers
-  (delete-other-windows)                                      ; And then unsplit the current window...
-  (delete-other-frames))                                      ; ...and remove other frames, too.
-
-(defun kill-all-buffers()
-  "Kill all buffers, including current, and unsplit the window."
-  (interactive)
-  (mapc 'kill-buffer (buffer-list))
-  (delete-other-windows)
-  (delete-other-frames))
 
 (defun browse-selected-file ()
   "Opens a file in a browser .  If a region is selected, the text of the
@@ -160,30 +146,43 @@ region is active try to browse to the file being visited."
                                                     (point))))
     (browse-url (buffer-file-name))))
 
-(defun toggle-mini-emacs ()
-  "Switches back and forth between minimal look for Emacs."
-  (interactive)
-  (if (fboundp 'specifier-instance)
-      ;; For XEmacs.
-      (let ((setting (not (specifier-instance menubar-visible-p))))
-        (set-specifier menubar-visible-p setting)
-        (set-specifier top-toolbar-visible-p setting)
-        (set-specifier top-gutter-visible-p setting))
-    (if (fboundp 'tool-bar-mode)
-        ;; For GNU Emacs.
-        (let ((setting (if tool-bar-mode 0 1))
-              (scroll-setting (if tool-bar-mode nil 'right)))
-          (scroll-bar-mode scroll-setting)
-          (tool-bar-mode setting)
-          (menu-bar-mode setting)))))
+(defun trim (str)
+  "Trim leading and tailing whitespace from str."
+  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'" str)
+    (setq str (replace-match "" t t str)))
+  str)
 
-(defun goto-match-paren (arg)
-  "Go to the matching parenthesis if on parenthesis, otherwise insert %.
-vi style of % jumping to matching brace."
-  (interactive "p")
-  (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
-        ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
-        (t (self-insert-command (or arg 1)))))
+(defun locate-buffer-dominator (file)
+  "Locates the first directory above the buffer file's directory
+that contains an file named as specified."
+  (if buffer-file-name
+      (let ((dir (file-name-directory buffer-file-name))
+            (root (locate-dominating-file (file-name-directory buffer-file-name) file)))
+        (if root
+            root
+          (error (concat "Could not locate " file " file dominating " dir))))
+    (error (concat "Could not locate " file " file; buffer has no file name."))))
+
+(defun build-tags ()
+  "Build etags using ctags in the director containg .git located
+above of current buffer's directory."
+  (interactive)
+  (let ((root (locate-buffer-dominator ".git")))
+    ;; FIXME: This shouldn't be a hard coded path, but currently
+    ;; the ctags being invoked is /usr/bin/ctags, which appears to
+    ;; invoke ctags within Xcode. Also need a ctags that supports
+    ;; Objective-C (and Swift).
+    (shell-command (concat "/usr/local/bin/ctags -e -R --extra=+fq --exclude=.git -f " root "/TAGS " root))
+    (visit-tags)
+    (message (concat "tags built for " root))))
+
+(defun visit-tags ()
+  "Visit the etags file TAGS located in direcotry above the
+current buffer's directory."
+  (interactive)
+  (let ((root (locate-buffer-dominator "TAGS")))
+    (visit-tags-table (concat root "/TAGS"))
+    (message (concat "visited tags file in " root))))
 
 (defun insert-newline-and-indent-relative ()
   "Inserts a newline and indents it to the width of the last line."
