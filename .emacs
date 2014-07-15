@@ -9,7 +9,7 @@
 ;; Set Variables.
 
 (blink-cursor-mode (- (*) (*) (*)))
-(setq           load-path (append load-path '("~/.elisp/" "~/.elisp/ocaml" "~/.elisp/emacs-rails" "~/.elisp/php-mode-1.5.0"))
+(setq           load-path (append load-path '("~/.elisp/"))
                 backup-directory-alist (quote ((".*" . "~/.emacs.d/autosave")))
                 tramp-backup-directory-alist (quote ((".*" . "~/.emacs.d/autosave")))
                 make-backup-files t
@@ -38,7 +38,6 @@
   (show-paren-mode))
 
 
-
 ;; Bind most frequently used commands to single keys when possible.
 
 (global-set-key "\M-o" 'other-window)
@@ -47,6 +46,9 @@
 (global-set-key [f2] 'split-window-vertically)
 (global-set-key [f3] 'split-window-right)
 (global-set-key [f10] 'delete-window)
+
+(global-set-key [(control \;)] 'etags-select-find-tag-at-point)
+(global-set-key [(control \')] 'etags-select-find-tag)
 
 ;; Use \C-z as namespace for custom keybindings.
 
@@ -72,6 +74,8 @@
 
 (fset 'yes-or-no-p 'y-or-n-p)
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode t))
+
+(load-library "etags-select.el")
 
 ;; Pretty diff mode
 

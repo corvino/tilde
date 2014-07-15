@@ -10,5 +10,3 @@
 !/.emacs
 
 !/.elisp
-/.elisp/*
-!/.elisp/update.sh
