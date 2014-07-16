@@ -3,7 +3,7 @@
 dir=~/.dotfiles
 olddir=~/dotfiles.old
 
-files=".bash_profile .bashrc .emacs .elisp .gitconfig .gitexclude"
+files=".bash_profile .bashrc .emacs .elisp .gitconfig .gitexclude .vimrc"
 
 if [ -e $olddir ]; then
     echo "$olddir already exists; can't move files out of the way."

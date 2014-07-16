@@ -25,6 +25,7 @@ then
 
     alias em='open -a Emacs'
     alias emacsclient='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient'
+    alias mvi='open -a MacVim'
 
 elif [ "linux-gnu" == $OSTYPE ] ; then
 
