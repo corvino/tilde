@@ -19,6 +19,9 @@ shopt -s checkwinsize
 
 if [[ $OSTYPE == "darwin"* ]]
 then
+    man_preview() {
+        man -t $1 | open -f -a Preview
+    }
 
     export CLICOLOR=1
     export JAVA_HOME=/Library/Java/Home
@@ -26,6 +29,7 @@ then
     alias em='open -a Emacs'
     alias emacsclient='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient'
     alias mvi='open -a MacVim'
+    alias mn=man_preview
 
 elif [ "linux-gnu" == $OSTYPE ] ; then
 
