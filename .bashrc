@@ -13,6 +13,9 @@ esac
 export HISTCONTROL=ignoredups
 shopt -s checkwinsize
 
+alias rbi='eval "$(rbenv init -)"'
+alias pyi='eval "$(pyenv init -)"'
+
 #
 # System-specific stuff.
 #
@@ -25,6 +28,7 @@ then
 
     export CLICOLOR=1
     export JAVA_HOME=/Library/Java/Home
+    export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
     alias em='open -a Emacs'
     alias emacsclient='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient'
