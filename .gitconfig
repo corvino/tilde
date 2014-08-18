@@ -20,7 +20,8 @@
     plog = log --pretty=format:'%h %ae %s' --graph
     tlog = log --date=local --pretty=format:'%h %ae %ad %s' --graph
 
-    diffstat = diff --name-status
+    stat = "!f() { git diff --name-status $1^ $1; }; f"
+    dstat = diff --name-status
     get = remote update
 
     spull = !git-svn fetch && git-svn rebase
