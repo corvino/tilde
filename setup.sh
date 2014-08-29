@@ -3,7 +3,7 @@
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 olddir="$dir/dotfiles.OLD"
 
-files=".bash_profile .bashrc .emacs .elisp .gitconfig .gitexclude .vimrc"
+files=".bash_profile .bashrc .emacs .elisp .gitconfig .gitexclude .vimrc .lldbinit .lldb"
 
 # Create the "backup" directory for existing files; but only if there
 # are existing files that aren't already symlinked appropriately. Fail

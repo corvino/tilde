@@ -1,0 +1,9 @@
+# Wow. It's pathetic that this has almost nothing in it. Let's change that.
+#
+# References:
+#   Github: https://github.com/search?q=lldbinit
+#   "Scripting With Python" and "Command Aliases Help":
+#       https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/gdb_to_lldb_transition_guide/document/lldb-basics.html#//apple_ref/doc/uid/TP40012917-CH2-SW21
+#   Nathan Eror's developer tools talks.
+
+command script import ~/.lldb/fsa.py
