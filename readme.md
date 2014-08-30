@@ -11,10 +11,9 @@ There is a setup.sh bash script that creates symlinks from the ~ to the
 appropriate files.
 
 Before creating the symlinks, the script also attempts to move any
-conflicting files from ~ to dotfiles.OLD. If a file is already
-appropriately symlinked, it is skipped. dotfiles.OLD is only created if
-it is needed; and if it is needed and exists, the script does not
-attempt to backup or link.
+conflicting files from ~ to BACKUP. If a file is already appropriately
+symlinked, it is skipped. BACKUP is only created if it is needed; and if
+it is needed and exists, the script does not attempt to backup or link.
 
 The setup process is simple: clone and run setup.sh.
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-olddir="$dir/dotfiles.OLD"
+backup="$dir/BACKUP"
 
 files=".bash_profile .bashrc .emacs .elisp .gitconfig .gitexclude .vimrc .lldbinit .lldb"
 
@@ -12,12 +12,12 @@ files=".bash_profile .bashrc .emacs .elisp .gitconfig .gitexclude .vimrc .lldbin
 
 for file in $files; do
     if [[ -e ~/$file && ! (-L ~/$file && $dir/$file == `readlink ~/$file`) ]]; then
-        if [ -e $olddir ]; then
-            echo "$olddir already exists; can't move files out of the way."
+        if [ -e $backup ]; then
+            echo "$backup already exists; can't move files out of the way."
             exit -1
         else
-            echo "Create $olddir"
-            mkdir -p $olddir
+            echo "Create $backup"
+            mkdir -p $backup
             break
         fi
     fi
@@ -26,7 +26,7 @@ done
 # Run through the files, moving and symlinking as necessary. If nothing
 # needs to be done, will simply output a list of the files checked.
 
-echo "Move existing files to $olddir and symlink from ~ to $dir (as necessary):"
+echo "Move existing files to $backup and symlink from ~ to $dir (as necessary):"
 
 for file in $files; do
     echo -n "  "
@@ -36,7 +36,7 @@ for file in $files; do
             echo -n "   "
         else
             echo -n "m+l"
-            mv ~/$file $olddir/
+            mv ~/$file $backup/
             ln -s $dir/$file ~/$file
         fi
     else
