@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 backup="$dir/BACKUP"
@@ -11,7 +11,10 @@ files=".bash_profile .bashrc .emacs .elisp .gitconfig .gitexclude .vimrc .lldbin
 # "merging" of backups!
 
 for file in $files; do
-    if [[ -e ~/$file && ! (-L ~/$file && $dir/$file == `readlink ~/$file`) ]]; then
+    # We have to test -e and -L, because a symbolic link that points to
+    # a nonexistent file returns false.
+    if [[ (-e ~/$file || -L ~/$file) && ! (-L ~/$file && $dir/$file == `readlink ~/$file`) ]]; then
+        echo "BACKUP!!!!"
         if [ -e $backup ]; then
             echo "$backup already exists; can't move files out of the way."
             exit -1
@@ -30,7 +33,7 @@ echo "Move existing files to $backup and symlink from ~ to $dir (as necessary):"
 
 for file in $files; do
     echo -n "  "
-    if [ -e ~/$file ]; then
+    if [[ -e ~/$file || -L ~/$file ]]; then
         if [[ -L ~/$file && $dir/$file == `readlink ~/$file` ]]; then
             # All done!!
             echo -n "   "
