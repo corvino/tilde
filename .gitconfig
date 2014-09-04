@@ -30,6 +30,8 @@
     ksdiff = difftool -y -t Kaleidoscope
     ksshow = !sh -c 'git difftool -y -t Kaleidoscope $1^ $1' -
 
+    qs = !git log --date=local --pretty=format:'%h %H %ae %ad %s' | head -n 1 | sed 's/$//'
+
 [mergetool]
     keepBackup = true
 

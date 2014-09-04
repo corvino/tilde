@@ -1,7 +1,12 @@
 [ -z "$PS1" ] && return   # If not running interactively, don't do anything
 
+parse_git_branch() {
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/[\1]/'
+}
+
 case "$TERM" in
-    xterm* ) export PS1='\[\033[31;1m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ ' ;;
+#    xterm* ) export PS1='\[\033[31;1m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ ' ;;
+    xterm* ) export PS1='\[\033[31;1m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[0;31m\]$(parse_git_branch)\[\033[00m\]\$ ' ;;
     *     ) export PS1='\u@\h:\w\$ ' ;;
 esac
 
@@ -28,7 +33,7 @@ then
 
     export CLICOLOR=1
     export JAVA_HOME=/Library/Java/Home
-    export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+    export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:~/bin
 
     alias em='open -a Emacs'
     alias emacsclient='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient'
