@@ -103,6 +103,28 @@
 (add-hook 'markdown-mode-hook (lambda () (when buffer-file-name (add-hook 'after-save-hook 'check-parens nil t))))
 (add-hook 'markdown-mode-hook (lambda () (modify-syntax-entry ?\" "\"" markdown-mode-syntax-table)))
 
+;; SML
+
+(autoload 'sml-mode "sml-mode" "Major mode for editing SML." t)
+(add-to-list 'auto-mode-alist '("\\.\\(sml\\|sig\\)\\'" . sml-mode))
+
+(defun sml-cmd-override ()
+  "Override sml--read-run-cmd to specify the sml command."
+  '("/usr/local/bin/sml" "" ""))
+
+(add-hook 'sml-mode-hook
+          (lambda()
+            (defalias 'sml--read-run-cmd 'sml-cmd-override)))
+
+;; Allow sml-run/run-sml before loading sml-mode.
+(defalias 'run-sml 'sml-run)
+(defun sml-run ()
+  "Load sml-mode and run sml-run with sml-cmd-override to avoid
+prompting for the sml command. sml-mode overrides this on load."
+  (interactive)
+  (load "sml-mode")
+  (apply 'sml-run (sml-cmd-override)))
+
 ;; Customize modes
 
 (add-hook 'c-mode-common-hook
