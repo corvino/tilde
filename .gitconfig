@@ -19,6 +19,7 @@
 [alias]
     plog = log --pretty=format:'%h %ae %s' --graph
     tlog = log --date=local --pretty=format:'%h %ae %ad %s' --graph
+    flog = log --pretty=fuller
 
     stat = "!f() { git diff --name-status $1^ $1; }; f"
     dstat = diff --name-status
@@ -31,6 +32,7 @@
     ksshow = !sh -c 'git difftool -y -t Kaleidoscope $1^ $1' -
 
     qs = !git log --date=local --pretty=format:'%h %H %ae %ad %s' | head -n 1 | sed 's/$//'
+    amdate = "!f() { GIT_COMMITTER_DATE=\"$1\" git commit --amend --date=\"$1\"; }; f"
 
 [mergetool]
     keepBackup = true
