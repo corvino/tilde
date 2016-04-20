@@ -18,7 +18,9 @@
                 truncate-partial-width-windows nil
                 column-number-mode t
                 line-number-mode t
-                visible-bell t
+                ;; visible bell is broken on El Capitan
+                ;; https://www.reddit.com/r/emacs/comments/3omsr2/weird_display_issue_in_os_x/
+                visible-bell nil
                 initial-scratch-message nil
                 inhibit-startup-message nil
                 standard-indent 4
@@ -49,6 +51,10 @@
 
 (global-set-key [(control \;)] 'etags-select-find-tag-at-point)
 (global-set-key [(control \')] 'etags-select-find-tag)
+
+;; suspend-frame crashes emacs when invoked from the keyboard shortcut
+;; on El Capitan. Which is totally bizarre, but lets not crash.
+(global-set-key "\C-x\C-z" nil)
 
 ;; Use \C-z as namespace for custom keybindings.
 
@@ -125,6 +131,30 @@ prompting for the sml command. sml-mode overrides this on load."
   (load "sml-mode")
   (apply 'sml-run (sml-cmd-override)))
 
+;; Go
+
+(require 'go-mode-autoloads)
+(add-hook 'go-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook 'gofmt-before-save)
+            (local-set-key (kbd "\C-zf") 'gofmt)))
+
+;; C#
+
+(autoload 'csharp-mode "csharp-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
+
+;; Protocol Buffers
+
+(require 'cl)
+(autoload 'protobuf-mode "protobuf-mode" "Major mode for editing protocol buffers." t)
+(add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode))
+
+(defconst my-protobuf-style
+  '((c-basic-offset . 2)))
+(add-hook 'protobuf-mode-hook
+          (lambda () (c-add-style "my-style" my-protobuf-style t)))
+
 ;; Customize modes
 
 (add-hook 'c-mode-common-hook
@@ -135,7 +165,9 @@ prompting for the sml command. sml-mode overrides this on load."
   '(lambda ()
      ;;(setq indent-tabs-mode nil)
      (define-key html-mode-map "\C-j" 'insert-newline-and-indent-relative)
-     (define-key html-mode-map "\t" 'indent-next-stop)))
+     (define-key html-mode-map "\t" 'indent-next-stop)
+     (setq tab-stop-list (number-sequence 2 120 2))
+     (setq tab-width 2)))
 
 (add-hook 'js-mode-hook
    '(lambda ()
@@ -237,3 +269,4 @@ current buffer's directory."
         tab-width 8))
 
 (setq auto-mode-alist (cons '(".*/linux-msm-2.6.32/.*\\.[ch]$" . linux-c-mode) auto-mode-alist))
+(add-to-list 'auto-mode-alist '("\\.mm\\'" . objc-mode))
