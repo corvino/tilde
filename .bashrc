@@ -21,6 +21,9 @@ shopt -s checkwinsize
 alias rbi='eval "$(rbenv init -)"'
 alias pyi='eval "$(pyenv init -)"'
 
+alias goc='go build'
+alias got='go test $(go list ./... | grep -v /vendor/)'
+
 #
 # System-specific stuff.
 #

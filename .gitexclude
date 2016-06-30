@@ -1,4 +1,10 @@
 *~
 .DS_Store
+
 xcuserdata
-xcshareddata
+**/project.xcworkspace/xcshareddata
+
+lldb-history
+
+.idea
+.iml

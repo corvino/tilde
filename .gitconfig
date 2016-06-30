@@ -34,6 +34,10 @@
     qs = !git log --date=local --pretty=format:'%h %H %ae %ad %s' | head -n 1 | sed 's/$//'
     amdate = "!f() { GIT_COMMITTER_DATE=\"$1\" git commit --amend --date=\"$1\"; }; f"
 
+    siri = submodule update --init --recursive
+    pusha = push -u --all
+    pusht = push --tags
+
 [mergetool]
     keepBackup = true
 

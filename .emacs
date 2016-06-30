@@ -24,7 +24,8 @@
                 initial-scratch-message nil
                 inhibit-startup-message nil
                 standard-indent 4
-                tab-stop-list (number-sequence 4 120 4))
+                tab-stop-list (number-sequence 4 120 4)
+                org-startup-indented t)
 (setq-default   tab-width 4
                 indent-tabs-mode nil
                 fill-column 72
@@ -270,3 +271,5 @@ current buffer's directory."
 
 (setq auto-mode-alist (cons '(".*/linux-msm-2.6.32/.*\\.[ch]$" . linux-c-mode) auto-mode-alist))
 (add-to-list 'auto-mode-alist '("\\.mm\\'" . objc-mode))
+
+(load-file "/Users/vino/code/glympsedebugger/scripts/enroute-tasks.el")
