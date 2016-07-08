@@ -18,6 +18,12 @@ esac
 export HISTCONTROL=ignoredups
 shopt -s checkwinsize
 
+alias ll="ls -lah"
+alias l1="ls -1"
+alias la="ls -a1"
+
+alias con="tail -40 -f /var/log/system.log"
+
 alias rbi='eval "$(rbenv init -)"'
 alias pyi='eval "$(pyenv init -)"'
 
