@@ -272,4 +272,9 @@ current buffer's directory."
 (setq auto-mode-alist (cons '(".*/linux-msm-2.6.32/.*\\.[ch]$" . linux-c-mode) auto-mode-alist))
 (add-to-list 'auto-mode-alist '("\\.mm\\'" . objc-mode))
 
-(load-file "/Users/vino/code/glympsedebugger/scripts/enroute-tasks.el")
+;; auto-source any .el files in ~/.elips_auto_src
+(if (file-directory-p "~/.elisp_auto_src")
+    (mapc
+     (lambda (x)
+       (load-file x))
+     (directory-files "~/.elisp_auto_src" t ".el$")))
