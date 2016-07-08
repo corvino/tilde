@@ -51,3 +51,13 @@ elif [ "linux-gnu" == $OSTYPE ] ; then
         alias ls='ls --color=auto'
     fi
 fi
+
+sourcedir=~/.bash_auto_src
+if [ -d "$sourcedir" ]; then
+    files=`ls -a1 $sourcedir`
+    for file in $files; do
+        if [ -f "$sourcedir/$file" ]; then
+            . "$sourcedir/$file"
+        fi
+    done
+fi
