@@ -37,6 +37,7 @@
     siri = submodule update --init --recursive
     pusha = push -u --all
     pusht = push --tags
+    pushb = push --set-upstream
 
 [mergetool]
     keepBackup = true
