@@ -84,6 +84,11 @@
 
 (load-library "etags-select.el")
 
+(add-hook 'dired-load-hook
+          (function (lambda  ()
+                      (define-key dired-mode-map "k" 'dired-kill-subdir)
+                      (define-key dired-mode-map "K" 'dired-do-kill-lines))))
+
 ;; Pretty diff mode
 
 (require 'diff-mode-)
