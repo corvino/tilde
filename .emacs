@@ -25,7 +25,8 @@
                 inhibit-startup-message nil
                 standard-indent 4
                 tab-stop-list (number-sequence 4 120 4)
-                org-startup-indented t)
+                org-startup-indented t
+                org-startup-folded nil)
 (setq-default   tab-width 4
                 indent-tabs-mode nil
                 fill-column 72
@@ -88,6 +89,14 @@
           (function (lambda  ()
                       (define-key dired-mode-map "k" 'dired-kill-subdir)
                       (define-key dired-mode-map "K" 'dired-do-kill-lines))))
+
+(add-hook 'org-mode-hook
+          (lambda ()
+            (local-set-key "\M-[" 'org-metaleft)
+            (local-set-key "\M-]" 'org-metaright)
+            (local-set-key "\M-p" 'org-metaup)
+            (local-set-key "\M-n" 'org-metadown)
+            ))
 
 ;; Pretty diff mode
 
