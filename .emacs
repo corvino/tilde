@@ -90,6 +90,8 @@
                       (define-key dired-mode-map "k" 'dired-kill-subdir)
                       (define-key dired-mode-map "K" 'dired-do-kill-lines))))
 
+(require 'direx)
+
 (add-hook 'org-mode-hook
           (lambda ()
             (local-set-key "\M-[" 'org-metaleft)
