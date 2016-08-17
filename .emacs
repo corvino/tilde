@@ -18,9 +18,7 @@
                 truncate-partial-width-windows nil
                 column-number-mode t
                 line-number-mode t
-                ;; visible bell is broken on El Capitan
-                ;; https://www.reddit.com/r/emacs/comments/3omsr2/weird_display_issue_in_os_x/
-                visible-bell nil
+                visible-bell t
                 initial-scratch-message nil
                 inhibit-startup-message nil
                 standard-indent 4
@@ -51,19 +49,11 @@
 (global-set-key [f3] 'split-window-right)
 (global-set-key [f10] 'delete-window)
 
-(global-set-key [(control \;)] 'etags-select-find-tag-at-point)
-(global-set-key [(control \')] 'etags-select-find-tag)
-
-;; suspend-frame crashes emacs when invoked from the keyboard shortcut
-;; on El Capitan. Which is totally bizarre, but lets not crash.
-(global-set-key "\C-x\C-z" nil)
-
 ;; Use \C-z as namespace for custom keybindings.
 
 (global-set-key "\C-z" nil)
 (global-set-key "\C-zl" 'goto-line)
-(global-set-key "\C-zb" 'build-tags)
-(global-set-key "\C-zv" 'visit-tags)
+
 (global-set-key [?\C-z backspace] 'revert-buffer)
 (global-set-key "\C-z/" 'comment-region)
 (global-set-key "\C-z?" 'uncomment-region)
@@ -74,16 +64,32 @@
 (global-set-key "\C-zw" 'gdb-many-windows)
 (global-set-key "\C-ze" 'gdb-restore-windows)
 
+;; etags
+
+(load-library "etags-select.el")
+
+;; These got changed in emacs 25. Set them back to what they were
+;; before. Maybe investigate at some point.
+(global-set-key "\M-." 'find-tag)
+(global-set-key "\M-," 'tags-loop-continue)
+(global-set-key "\M-*" 'pop-tag-mark)
+
+(global-set-key "\C-zt" 'visit-tags)
+(global-set-key "\C-zb" 'build-tags)
+(global-set-key (kbd "\C-z \C-f") 'tags-search)
+(global-set-key (kbd "\C-z \C-a") 'tags-apropos)
+
+(global-set-key [(control \;)] 'etags-select-find-tag-at-point)
+(global-set-key [(control \')] 'etags-select-find-tag)
+
 ;; Key bindings for custom functions.
 
-(define-key global-map [(control ?z) ?t] 'de-pollinate)
+(define-key global-map [(control ?z) ?s] 'de-pollinate)
 (define-key global-map [(control ?z) ?p] 'goto-matching-paren)
 (define-key global-map [(control ?z) ?o] 'browse-selected-file)
 
 (fset 'yes-or-no-p 'y-or-n-p)
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode t))
-
-(load-library "etags-select.el")
 
 (add-hook 'dired-load-hook
           (function (lambda  ()
@@ -91,6 +97,14 @@
                       (define-key dired-mode-map "K" 'dired-do-kill-lines))))
 
 (require 'direx)
+(global-set-key (kbd "C-x C-j") 'direx:jump-to-directory)
+(global-set-key (kbd "C-z C-j") 'direx:find-directory)
+(setq direx:leaf-icon "  "
+      direx:open-icon "▾ "
+      direx:closed-icon "▸ ")
+;; https://github.com/m2ym/direx-el
+;; https://www.emacswiki.org/emacs/NeoTree
+;; https://github.com/jaypei/emacs-neotree
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -183,12 +197,12 @@ prompting for the sml command. sml-mode overrides this on load."
      ;;(setq indent-tabs-mode nil)
      (define-key html-mode-map "\C-j" 'insert-newline-and-indent-relative)
      (define-key html-mode-map "\t" 'indent-next-stop)
-     (setq tab-stop-list (number-sequence 2 120 2))
-     (setq tab-width 2)))
+     (setq tab-stop-list (number-sequence 4 120 4))
+     (setq tab-width 4)))
 
 (add-hook 'js-mode-hook
    '(lambda ()
-      (setq js-indent-level 2)))
+      (setq js-indent-level 4)))
 
 ;; Custom functions
 
@@ -229,7 +243,7 @@ region is active try to browse to the file being visited."
 
 (defun locate-buffer-dominator (file)
   "Locates the first directory above the buffer file's directory
-that contains an file named as specified."
+that contains a file named as specified."
   (if buffer-file-name
       (let ((dir (file-name-directory buffer-file-name))
             (root (locate-dominating-file (file-name-directory buffer-file-name) file)))

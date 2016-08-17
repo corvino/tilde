@@ -19,16 +19,21 @@ export HISTCONTROL=ignoredups
 shopt -s checkwinsize
 
 alias ll="ls -lah"
-alias l1="ls -1"
+alias lq="ls -1"
 alias la="ls -a1"
 
 alias con="tail -40 -f /var/log/system.log"
+
+alias tag="ctags -e -R ."
 
 alias rbi='eval "$(rbenv init -)"'
 alias pyi='eval "$(pyenv init -)"'
 
 alias goc='go build'
 alias got='go test $(go list ./... | grep -v /vendor/)'
+
+alias dks='docker stop $(docker ps -q)'
+alias dkl='docker logs -f $(docker ps -q)'
 
 #
 # System-specific stuff.
