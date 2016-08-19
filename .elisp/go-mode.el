@@ -5,7 +5,7 @@
 ;; license that can be found in the LICENSE file.
 
 ;; Author: The go-mode Authors
-;; Version: 1.3.1
+;; Version: 1.4.0
 ;; Keywords: languages go
 ;; URL: https://github.com/dominikh/go-mode.el
 ;;
@@ -199,7 +199,7 @@ point to the wrapper script."
 (defcustom gofmt-command "gofmt"
   "The 'gofmt' command.
 Some users may replace this with 'goimports'
-from https://github.com/bradfitz/goimports."
+from https://golang.org/x/tools/cmd/goimports."
   :type 'string
   :group 'go)
 
@@ -1329,14 +1329,14 @@ Playground URL."
            (buffer-substring-no-properties start end)
            'utf-8))
          (content-buf (url-retrieve
-                       "http://play.golang.org/share"
+                       "https://play.golang.org/share"
                        (lambda (arg)
                          (cond
                           ((equal :error (car arg))
                            (signal 'go-play-error (cdr arg)))
                           (t
                            (re-search-forward "\n\n")
-                           (let ((url (format "http://play.golang.org/p/%s"
+                           (let ((url (format "https://play.golang.org/p/%s"
                                               (buffer-substring (point) (point-max)))))
                              (when go-play-browse-function
                                (funcall go-play-browse-function url)))))))))))

@@ -6,6 +6,8 @@ curl 'http://jblevins.org/projects/markdown-mode/markdown-mode.el' > ~/.elisp/ma
 curl 'https://www.emacswiki.org/emacs/download/etags-select.el' > ~/.elisp/etags-select.el
 curl 'http://web.mit.edu/andersk/src/protobuf-2.5.0/editors/protobuf-mode.el' > ~/.elisp/protobuf-mode.el
 curl 'https://raw.githubusercontent.com/josteink/csharp-mode/master/csharp-mode.el' > csharp-mode.el
+curl 'https://raw.githubusercontent.com/m2ym/direx-el/master/direx.el' > ~/.elisp/direx.el
+curl 'https://raw.githubusercontent.com/chrisbarrett/swift-mode/master/swift-mode.el' > ~/.elisp/swift-mode.el
 
 # Go
 curl 'https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode-autoloads.el' > ~/.elisp/go-mode-autoloads.el

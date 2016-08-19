@@ -121,6 +121,11 @@
 (autoload 'ediff-files "ediff" "Intelligent Emacs interface to diff" t)
 (autoload 'ediff-files-remote "ediff" "Intelligent Emacs interface to diff")
 
+;; Swift
+
+(autoload 'swift-mode "swift-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.swift\\'" . swift-mode))
+
 ;; Apache
 
 (autoload 'apache-mode "apache-mode" nil t)
