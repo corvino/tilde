@@ -6,11 +6,13 @@
 (if (and (fboundp 'tool-bar-mode) tool-bar-mode) (tool-bar-mode 0))
 (if (and (fboundp 'scroll-bar-mode) scroll-bar-mode) (scroll-bar-mode nil))
 
+(add-to-list 'load-path "~/.elisp")
+(add-to-list 'load-path "~/.elisp/slime")
+
 ;; Set Variables.
 
 (blink-cursor-mode (- (*) (*) (*)))
-(setq           load-path (append load-path '("~/.elisp/"))
-                backup-directory-alist (quote ((".*" . "~/.emacs.d/autosave")))
+(setq           backup-directory-alist (quote ((".*" . "~/.emacs.d/autosave")))
                 tramp-backup-directory-alist (quote ((".*" . "~/.emacs.d/autosave")))
                 make-backup-files t
                 global-font-lock-mode t
@@ -91,20 +93,21 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode t))
 
+(require 'slime-autoloads)
+
+(require 'direx)
+;; https://github.com/m2ym/direx-el
+;; https://www.emacswiki.org/emacs/NeoTree
+;; https://github.com/jaypei/emacs-neotree
 (add-hook 'dired-load-hook
           (function (lambda  ()
                       (define-key dired-mode-map "k" 'dired-kill-subdir)
                       (define-key dired-mode-map "K" 'dired-do-kill-lines))))
-
-(require 'direx)
 (global-set-key (kbd "C-x C-j") 'direx:jump-to-directory)
 (global-set-key (kbd "C-z C-j") 'direx:find-directory)
 (setq direx:leaf-icon "  "
       direx:open-icon "▾ "
       direx:closed-icon "▸ ")
-;; https://github.com/m2ym/direx-el
-;; https://www.emacswiki.org/emacs/NeoTree
-;; https://github.com/jaypei/emacs-neotree
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -308,8 +311,8 @@ current buffer's directory."
 (add-to-list 'auto-mode-alist '("\\.mm\\'" . objc-mode))
 
 ;; auto-source any .el files in ~/.elips_auto_src
-(if (file-directory-p "~/.elisp_auto_src")
+(if (file-directory-p "~/.elispac")
     (mapc
      (lambda (x)
        (load-file x))
-     (directory-files "~/.elisp_auto_src" t ".el$")))
+     (directory-files "~/.elispac" t ".el$")))

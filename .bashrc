@@ -63,7 +63,7 @@ elif [ "linux-gnu" == $OSTYPE ] ; then
     fi
 fi
 
-sourcedir=~/.bash_auto_src
+sourcedir=~/.bashac
 if [ -d "$sourcedir" ]; then
     files=`ls -a1 $sourcedir`
     for file in $files; do

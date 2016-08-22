@@ -1,0 +1,3 @@
+[submodule ".elisp/slime"]
+	path = .elisp/slime
+	url = git@github.com:slime/slime.git
