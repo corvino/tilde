@@ -7,6 +7,9 @@
 [submodule ".elisp/go-mode"]
 	path = .elisp/go-mode
 	url = git@github.com:dominikh/go-mode.el.git
+[submodule ".elisp/markdown-mode"]
+	path = .elisp/markdown-mode
+	url = git@github.com:jrblevin/markdown-mode.git
 [submodule ".elisp/slime"]
 	path = .elisp/slime
 	url = git@github.com:slime/slime.git

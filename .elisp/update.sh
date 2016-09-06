@@ -29,11 +29,10 @@ fetch_elpa_package() {
     curl -L https://elpa.gnu.org/packages/archive-contents | perl -pe 's/(^\(1|\n)//g' | perl -pe 's/\]\)/])\n/g' | perl -pe 's/^ *\(([a-z0-9A-Z-]*).*\[\(([0-9 ]*).*(single|tar).*/\1-\2.\3/g' | perl -pe 's/ /./g' | perl -pe 's/single/el/g' | perl -pe 's/\)//g' | grep -i -e "$1" | xargs -I {} curl -L  https://elpa.gnu.org/packages/{} -o ~/.elisp/$1.el
 }
 
+
 fetch_emacswiki_file 'apache-mode'
 fetch_emacswiki_file 'diff-mode-'
 fetch_emacswiki_file 'etags-select'
-
-curl 'http://jblevins.org/projects/markdown-mode/markdown-mode.el' > ~/.elisp/markdown-mode.el
 
 echo -e "${green}Fetching {bold}protobuf-mode{$green} from github.com:google/protobuf.${end}"
 curl 'https://raw.githubusercontent.com/google/protobuf/master/editors/protobuf-mode.el' > ~/.elisp/protobuf-mode.el

@@ -14,6 +14,7 @@
 (add-to-list 'load-path "~/.elisp/csharp-mode")
 (add-to-list 'load-path "~/.elisp/direx-el")
 (add-to-list 'load-path "~/.elisp/go-mode")
+(add-to-list 'load-path "~/.elisp/markdown-mode")
 (add-to-list 'load-path "~/.elisp/slime")
 (add-to-list 'load-path "~/.elisp/swift-mode")
 
