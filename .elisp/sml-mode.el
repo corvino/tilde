@@ -1,9 +1,9 @@
 ;;; sml-mode.el --- Major mode for editing (Standard) ML  -*- lexical-binding: t; coding: utf-8 -*-
 
-;; Copyright (C) 1989,1999,2000,2004,2007,2010-2014  Free Software Foundation, Inc.
+;; Copyright (C) 1989,1999,2000,2004,2007,2010-2015  Free Software Foundation, Inc.
 
 ;; Maintainer: (Stefan Monnier) <monnier@iro.umontreal.ca>
-;; Version: 6.5
+;; Version: 6.7
 ;; Keywords: SML
 ;; Author:	Lars Bo Nielsen
 ;;		Olin Shivers
@@ -266,6 +266,9 @@ notion of \"the end of an outline\".")
 This may sound like a neat trick, but be extra careful: it changes the
 alignment and can thus lead to nasty surprises w.r.t layout."
   :type 'boolean)
+(if (fboundp 'prettify-symbols-mode)
+    (make-obsolete-variable 'sml-font-lock-symbols
+                            'prettify-symbols-mode "24.4"))
 
 (defconst sml-font-lock-symbols-alist
   '(("fn" . ?λ)
@@ -297,8 +300,8 @@ Regexp match data 0 points to the chars."
   ;; Check that the chars should really be composed into a symbol.
   (let* ((start (match-beginning 0))
 	 (end (match-end 0))
-	 (syntaxes (if (eq (char-syntax (char-after start)) ?w)
-		       '(?w) '(?. ?\\))))
+	 (syntaxes (if (memq (char-syntax (char-after start)) '(?w ?_))
+		       '(?w ?_) '(?. ?\\))))
     (if (or (memq (char-syntax (or (char-before start) ?\ )) syntaxes)
 	    (memq (char-syntax (or (char-after end) ?\ )) syntaxes)
 	    (memq (get-text-property start 'face)
@@ -441,6 +444,7 @@ Regexp match data 0 points to the chars."
               (decls "type" decls)
               (decls "open" decls)
               (decls "and" decls)
+              (decls "withtype" decls)
               (decls "infix" decls)
               (decls "infixr" decls)
               (decls "nonfix" decls)
@@ -468,8 +472,8 @@ Regexp match data 0 points to the chars."
      '((assoc "->") (assoc "*"))
      '((assoc "val" "fun" "type" "datatype" "abstype" "open" "infix" "infixr"
               "nonfix" "functor" "signature" "structure" "exception"
-              "include" "sharing" "local"
-              )
+              "include" "sharing" "local")
+       (assoc "withtype")
        (assoc "and"))
      '((assoc "orelse") (assoc "andalso") (nonassoc ":"))
      '((assoc ";")) '((assoc ",")) '((assoc "d|")))
@@ -512,69 +516,65 @@ Regexp match data 0 points to the chars."
         (>= mincol startcol)))))
 
 (defun sml-smie-rules (kind token)
-  ;; I much preferred the pcase version of the code, especially while
-  ;; edebugging the code.  But that will have to wait until we get rid of
-  ;; support for Emacs-23.
-  (case kind
-    (:elem (case token
-             (basic sml-indent-level)
-             (args  sml-indent-args)))
-    (:list-intro (member token '("fn")))
-    (:close-all t)
-    (:after
+  (pcase (cons kind token)
+    (`(:elem . basic) sml-indent-level)
+    (`(:elem . args)  sml-indent-args)
+    (`(:list-intro . "fn") t)
+    (`(:close-all . ,_) t)
+    (`(:after . "struct") 0)
+    (`(:after . "=>") (if (smie-rule-hanging-p) 0 2))
+    (`(:after . "in") (if (smie-rule-parent-p "local") 0))
+    (`(:after . "of") 3)
+    (`(:after . ,(or `"(" `"{" `"[")) (if (not (smie-rule-hanging-p)) 2))
+    (`(:after . "else") (if (smie-rule-hanging-p) 0)) ;; (:next "if" 0)
+    (`(:after . ,(or `"|" `"d|" `";" `",")) (smie-rule-separator kind))
+    (`(:after . "d=")
+     (if (and (smie-rule-parent-p "val") (smie-rule-next-p "fn")) -3))
+    (`(:before . "=>") (if (smie-rule-parent-p "fn") 3))
+    (`(:before . "of") 1)
+    ;; FIXME: pcase in Emacs<24.4 bumps into a bug if we do this:
+    ;;(`(:before . ,(and `"|" (guard (smie-rule-prev-p "of")))) 1)
+    (`(:before . "|") (if (smie-rule-prev-p "of") 1 (smie-rule-separator kind)))
+    (`(:before . ,(or `"|" `"d|" `";" `",")) (smie-rule-separator kind))
+    ;; Treat purely syntactic block-constructs as being part of their parent,
+    ;; when the opening statement is hanging.
+    (`(:before . ,(or `"let" `"(" `"[" `"{")) ; "struct"? "sig"?
+     (if (smie-rule-hanging-p) (smie-rule-parent)))
+    ;; Treat if ... else if ... as a single long syntactic construct.
+    ;; Similarly, treat fn a => fn b => ... as a single construct.
+    (`(:before . ,(or `"if" `"fn"))
+     (and (not (smie-rule-bolp))
+          (smie-rule-prev-p (if (equal token "if") "else" "=>"))
+          (smie-rule-parent)))
+    (`(:before . "and")
+     ;; FIXME: maybe "and" (c|sh)ould be handled as an smie-separator.
      (cond
-      ((equal token "struct") 0)
-      ((equal token "=>") (if (smie-rule-hanging-p) 0 2))
-      ((equal token "in") (if (smie-rule-parent-p "local") 0))
-      ((equal token "of") 3)
-      ((member token '("(" "{" "[")) (if (not (smie-rule-hanging-p)) 2))
-      ((equal token "else") (if (smie-rule-hanging-p) 0)) ;; (:next "if" 0)
-      ((member token '("|" "d|" ";" ",")) (smie-rule-separator kind))
-      ((equal token "d=")
-       (if (and (smie-rule-parent-p "val") (smie-rule-next-p "fn")) -3))))
-    (:before
+      ((smie-rule-parent-p "datatype" "withtype")
+       (if (sml--rightalign-and-p) 5 0))
+      ((smie-rule-parent-p "fun" "val") 0)))
+    (`(:before . "withtype") 0)
+    (`(:before . "d=")
      (cond
-      ((equal token "=>") (if (smie-rule-parent-p "fn") 3))
-      ((equal token "of") 1)
-      ;; In case the language is extended to allow a | directly after of.
-      ((and (equal token "|") (smie-rule-prev-p "of")) 1)
-      ((member token '("|" "d|" ";" ",")) (smie-rule-separator kind))
-      ;; Treat purely syntactic block-constructs as being part of their parent,
-      ;; when the opening statement is hanging.
-      ((member token '("let" "(" "[" "{")) ; "struct"? "sig"?
-       (if (smie-rule-hanging-p) (smie-rule-parent)))
-      ;; Treat if ... else if ... as a single long syntactic construct.
-      ;; Similarly, treat fn a => fn b => ... as a single construct.
-      ((member token '("if" "fn"))
-       (and (not (smie-rule-bolp))
-            (smie-rule-prev-p (if (equal token "if") "else" "=>"))
-            (smie-rule-parent)))
-      ((equal token "and")
-       ;; FIXME: maybe "and" (c|sh)ould be handled as an smie-separator.
-       (cond
-        ((smie-rule-parent-p "datatype") (if (sml--rightalign-and-p) 5 0))
-        ((smie-rule-parent-p "fun" "val") 0)))
-      ((equal token "d=")
-       (cond
-        ((smie-rule-parent-p "datatype") (if (smie-rule-bolp) 2))
-        ((smie-rule-parent-p "structure" "signature" "functor") 0)))
-      ;; Indent an expression starting with "local" as if it were starting
-      ;; with "fun".
-      ((equal token "local") (smie-indent-keyword "fun"))
-      ;; FIXME: type/val/fun/... are separators but "local" is not, even though
-      ;; it appears in the same list.  Try to fix up the problem by hand.
-      ;; ((or (equal token "local")
-      ;;      (equal (cdr (assoc token smie-grammar))
-      ;;             (cdr (assoc "fun" smie-grammar))))
-      ;;  (let ((parent (save-excursion (smie-backward-sexp))))
-      ;;    (when (or (and (equal (nth 2 parent) "local")
-      ;;                   (null (car parent)))
-      ;;              (progn
-      ;;                (setq parent (save-excursion (smie-backward-sexp "fun")))
-      ;;                (eq (car parent) (nth 1 (assoc "fun" smie-grammar)))))
-      ;;      (goto-char (nth 1 parent))
-      ;;      (cons 'column (smie-indent-virtual)))))
-      ))))
+      ((smie-rule-parent-p "fun") 2)
+      ((smie-rule-parent-p "datatype") (if (smie-rule-bolp) 2))
+      ((smie-rule-parent-p "structure" "signature" "functor") 0)))
+    ;; Indent an expression starting with "local" as if it were starting
+    ;; with "fun".
+    (`(:before . "local") (smie-indent-keyword "fun"))
+    ;; FIXME: type/val/fun/... are separators but "local" is not, even though
+    ;; it appears in the same list.  Try to fix up the problem by hand.
+    ;; ((or (equal token "local")
+    ;;      (equal (cdr (assoc token smie-grammar))
+    ;;             (cdr (assoc "fun" smie-grammar))))
+    ;;  (let ((parent (save-excursion (smie-backward-sexp))))
+    ;;    (when (or (and (equal (nth 2 parent) "local")
+    ;;                   (null (car parent)))
+    ;;              (progn
+    ;;                (setq parent (save-excursion (smie-backward-sexp "fun")))
+    ;;                (eq (car parent) (nth 1 (assoc "fun" smie-grammar)))))
+    ;;      (goto-char (nth 1 parent))
+    ;;      (cons 'column (smie-indent-virtual)))))
+    ))
 
 (defun sml-smie-definitional-equal-p ()
   "Figure out which kind of \"=\" this is.
@@ -591,16 +591,23 @@ Assumes point is right before the = sign."
   ;; where the "type t = s.t" is mistaken for a type definition.
   (save-excursion
     (let ((res (smie-backward-sexp "=")))
-      (member (nth 2 res) `(":" ,@sml-=-starter-syms)))))
+      (member (nth 2 res) `(":" ":>" ,@sml-=-starter-syms)))))
 
 (defun sml-smie-non-nested-of-p ()
   ;; FIXME: Maybe datatype-|-p makes this nested-of business unnecessary.
   "Figure out which kind of \"of\" this is.
 Assumes point is right before the \"of\" symbol."
   (save-excursion
-    (and (re-search-backward (concat "\\(" sml-non-nested-of-starter-re
-                                     "\\)\\|\\_<case\\_>") nil t)
-         (match-beginning 1))))
+    ;; (let ((case-fold-search nil))
+    ;;   (and (re-search-backward (concat "\\(" sml-non-nested-of-starter-re
+    ;;                                    "\\)\\|\\_<case\\_>")
+    ;;                            nil t)
+    ;;        (match-beginning 1)))
+    (and (stringp (sml-smie-backward-token-1))
+         (let ((tok (sml-smie-backward-token-1)))
+           (if (equal tok "=")
+               (equal "d=" (sml-smie-forward-token))
+             (member tok '("|" "exception")))))))
 
 (defun sml-smie-datatype-|-p ()
   "Figure out which kind of \"|\" this is.
@@ -773,6 +780,9 @@ Assumes point is right before the | symbol."
     ;; Maybe we should insert the command into the buffer and then call
     ;; comint-send-input?
     (sml-prog-proc-comint-input-filter-function nil)
+    (save-excursion (goto-char (process-mark proc))
+                    (unless (bolp) (insert "\n"))
+                    (set-marker (process-mark proc) (point)))
     (comint-send-string proc (concat str (sml-prog-proc--prop command-eol)))))
 
 (defun sml-prog-proc-load-file (file &optional and-go)
@@ -982,8 +992,24 @@ The format specifier \"%s\" will be converted into the directory name
 specified when running the command \\[sml-cd].")
 
 (defvar sml-error-regexp-alist
-  `( ;; Poly/ML messages
-    ("^\\(Error\\|Warning:\\) in '\\(.+\\)', line \\([0-9]+\\)" 2 3)
+  `(;; Poly/ML messages
+    ;;
+    ;; Warning- in 'polyml.ML', line 135.
+    ;; Matches are not exhaustive.
+    ;; Found near
+    ;;   fun
+    ;;      convert _ (... ...) = ML_Pretty.Break (false, ...) |
+    ;;         convert _ ... = ML_Pretty.Break (...) |
+    ;;         convert ... = let ... in ... end |
+    ;;         convert ... = …
+    ;;
+    ;; Error- in 'HTTP.sml', line 370.
+    ;; Value or constructor (read_line) has not been declared
+    ;; Found near
+    ;;   case read_line bin of
+    ;;      NONE => () |
+    ;;      SOME s => (if s = "" then print "DONE\n" else (... ...; ...))
+    ("^\\(?:> \\)?\\(?:Error\\|W\\(arning\\)\\)[-:] in '\\(.+\\)', line \\([0-9]+\\)" 2 3 nil (1))
     ;; Moscow ML
     ("^File \"\\([^\"]+\\)\", line \\([0-9]+\\)\\(-\\([0-9]+\\)\\)?, characters \\([0-9]+\\)-\\([0-9]+\\):" 1 2 5)
     ;; SML/NJ:  the file-pattern is anchored to avoid
@@ -1233,6 +1259,8 @@ This mode runs `sml-mode-hook' just before exiting.
 See also (info \"(sml-mode)Top\").
 \\{sml-mode-map}"
   (set (make-local-variable 'font-lock-defaults) sml-font-lock-defaults)
+  (set (make-local-variable 'prettify-symbols-alist)
+       sml-font-lock-symbols-alist)
   (set (make-local-variable 'outline-regexp) sml-outline-regexp)
   (set (make-local-variable 'imenu-create-index-function)
        'sml-imenu-create-index)
@@ -1805,6 +1833,35 @@ If nil, align it with previous cases."
 
 ;;;; ChangeLog:
 
+;; 2015-02-12  Stefan Monnier  <monnier@iro.umontreal.ca>
+;; 
+;; 	* sml-mode/sml-mode.el: Bump version to make a new release
+;; 
+;; 2015-02-12  Stefan Monnier  <monnier@iro.umontreal.ca>
+;; 
+;; 	* sml-mode/sml-mode.el (sml-smie-rules): Work around Emacs-24.3 bug.
+;; 
+;; 2015-02-09  Stefan Monnier  <monnier@iro.umontreal.ca>
+;; 
+;; 	* sml-mode.el: Add prettify-symbols-mode and Poly/ML support
+;; 
+;; 	(sml-font-lock-symbols): Mark obsolete.
+;; 	(sml-font-lock-compose-symbol): Use symbol-boundaries rather 
+;; 	word-boundaries.
+;; 	(sml-smie-rules): Tweak indentation after "fun".
+;; 	(sml-smie-definitional-equal-p): Handle ":>".
+;; 	(sml-prog-proc-send-string): Try and avoid mixing prompt/userinput and 
+;; 	process output on the same line.
+;; 	(sml-error-regexp-alist): Add Poly/ML support.
+;; 	(sml-mode): Add prettify-symbols-mode support.
+;; 
+;; 2014-10-15  Stefan Monnier  <monnier@iro.umontreal.ca>
+;; 
+;; 	* packages/sml-mode/sml-mode.el (sml-smie-grammar): Add "withtype".
+;; 	(sml-smie-rules): Use pcase.
+;; 	(sml-smie-non-nested-of-p): Rewrite to avoid regexp and stay closer to
+;; 	point.
+;; 
 ;; 2014-06-17  Stefan Monnier  <monnier@iro.umontreal.ca>
 ;; 
 ;; 	* sml-mode/sml-mode.el: Release new version.
