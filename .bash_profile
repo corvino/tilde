@@ -4,6 +4,4 @@ if [ -f ~/.bashrc ]; then
     . ~/.bashrc
 fi
 
-if [ -d ~/bin ] ; then
-    export PATH=~/bin:"${PATH}"
-fi
+PATH=~/.binac:~/bin:"${PATH}"

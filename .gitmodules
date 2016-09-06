@@ -1,3 +1,15 @@
+[submodule ".elisp/csharp-mode"]
+	path = .elisp/csharp-mode
+	url = git@github.com:josteink/csharp-mode.git
+[submodule ".elisp/direx-el"]
+	path = .elisp/direx-el
+	url = git@github.com:m2ym/direx-el.git
+[submodule ".elisp/go-mode"]
+	path = .elisp/go-mode
+	url = git@github.com:dominikh/go-mode.el.git
 [submodule ".elisp/slime"]
 	path = .elisp/slime
 	url = git@github.com:slime/slime.git
+[submodule ".elisp/swift-mode"]
+	path = .elisp/swift-mode
+	url = git@github.com:chrisbarrett/swift-mode.git

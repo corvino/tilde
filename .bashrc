@@ -35,6 +35,8 @@ alias got='go test $(go list ./... | grep -v /vendor/)'
 alias dks='docker stop $(docker ps -q)'
 alias dkl='docker logs -f $(docker ps -q)'
 
+PATH=$PATH:~/.binac
+
 #
 # System-specific stuff.
 #
@@ -47,7 +49,6 @@ then
 
     export CLICOLOR=1
     export JAVA_HOME=/Library/Java/Home
-    export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:~/bin
 
     alias em='open -a Emacs'
     alias emacsclient='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient'

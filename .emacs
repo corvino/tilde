@@ -1,13 +1,21 @@
 ;; -*- Mode: Emacs-Lisp; comment-column: 62 -*-
 ;; ==========================================================================
 ;;
-;; Copyright © 1997-2014  Nathan Corvino
+;; Copyright © 1997-2016  Nathan Corvino
 
 (if (and (fboundp 'tool-bar-mode) tool-bar-mode) (tool-bar-mode 0))
 (if (and (fboundp 'scroll-bar-mode) scroll-bar-mode) (scroll-bar-mode nil))
 
+(let ((new-paths (list (expand-file-name "~/.binac") "/usr/local/bin")))
+  (setenv "PATH" (concat (mapconcat 'identity new-paths ":") ":" (getenv "PATH")))
+  (setq exec-path (append new-paths exec-path)))
+
 (add-to-list 'load-path "~/.elisp")
+(add-to-list 'load-path "~/.elisp/csharp-mode")
+(add-to-list 'load-path "~/.elisp/direx-el")
+(add-to-list 'load-path "~/.elisp/go-mode")
 (add-to-list 'load-path "~/.elisp/slime")
+(add-to-list 'load-path "~/.elisp/swift-mode")
 
 ;; Set Variables.
 
@@ -173,6 +181,7 @@ prompting for the sml command. sml-mode overrides this on load."
 ;; Go
 
 (require 'go-mode-autoloads)
+(setq gofmt-command "goimports")
 (add-hook 'go-mode-hook
           (lambda ()
             (add-hook 'before-save-hook 'gofmt-before-save)

@@ -64,12 +64,13 @@
 ;;; Code:
 
 (require 'cc-mode)
+(require 'cl)
 
 (eval-when-compile
   (require 'cc-langs)
   (require 'cc-fonts))
 
-;; This mode does not inherit properties from other modes. So, we do not use 
+;; This mode does not inherit properties from other modes. So, we do not use
 ;; the usual `c-add-language' function.
 (eval-and-compile
   (put 'protobuf-mode 'c-mode-prefix "protobuf-"))
@@ -106,7 +107,7 @@
 ;; cc-mode.  So, we approximate as best we can.
 
 (c-lang-defconst c-type-list-kwds
-  protobuf '("extensions" "to"))
+  protobuf '("extensions" "to" "reserved"))
 
 (c-lang-defconst c-typeless-decl-kwds
   protobuf '("extend" "rpc" "option" "returns"))
