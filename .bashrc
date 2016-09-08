@@ -31,6 +31,7 @@ alias pyi='eval "$(pyenv init -)"'
 
 alias goc='go build'
 alias got='go test $(go list ./... | grep -v /vendor/)'
+alias gotag="find . -type f -name '*.go' | xargs ctags -e"
 
 alias dks='docker stop $(docker ps -q)'
 alias dkl='docker logs -f $(docker ps -q)'
