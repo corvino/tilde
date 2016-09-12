@@ -102,7 +102,12 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode t))
 
+;; (eval-after-load 'slime
+;;   `(define-key slime-prefix-map (kbd "C-c C-f") 'slime-eval-buffer))
 (require 'slime-autoloads)
+(add-hook 'slime-mode-hook
+          (lambda ()
+            (local-set-key (kbd "C-c C-f") 'slime-eval-buffer)))
 
 (require 'direx)
 ;; https://github.com/m2ym/direx-el
