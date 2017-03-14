@@ -50,6 +50,13 @@
     cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
     trustexitcode = true
 
+# https://github.com/simonwagner/mergepbx
+[mergetool "mergepbx"]
+    cmd = mergepbx "$BASE" "$LOCAL" "$REMOTE" -o "$MERGED"
+[merge "mergepbx"]
+    name = Xcode project files merger
+    driver = mergepbx %O %A %B
+
 [difftool "sourcetree"]
     cmd = opendiff \"$LOCAL\" \"$REMOTE\"
     path =

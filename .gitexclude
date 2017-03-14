@@ -1,14 +1,16 @@
+.vino
+
 *~
 .DS_Store
 
 TAGS
 
-xcuserdata
-**/project.xcworkspace/xcshareddata
+*.pyc
 
 lldb-history
 
+xcuserdata
+**/project.xcworkspace/xcshareddata
+
 .idea
 .iml
-
-.vino

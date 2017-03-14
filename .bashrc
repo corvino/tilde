@@ -36,14 +36,15 @@ alias gotag="find . -type f -name '*.go' | xargs ctags -e"
 alias dks='docker stop $(docker ps -q)'
 alias dkl='docker logs -f $(docker ps -q)'
 
+alias ispark='PYSPARK_DRIVER_PYTHON=ipython pyspark'
+
 PATH=$PATH:~/.binac
 
 #
 # System-specific stuff.
 #
 
-if [[ $OSTYPE == "darwin"* ]]
-then
+if [[ $OSTYPE == "darwin"* ]]; then
     man_preview() {
         man -t $1 | open -f -a Preview
     }
@@ -55,6 +56,15 @@ then
     alias emacsclient='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient'
     alias mvi='open -a MacVim'
     alias mn=man_preview
+
+    INTELLIJ=`ls -1d /Applications/IntelliJ\ * | tail -n1`
+    if [ -d "$INTELLIJ" ]; then
+        alias intellij="open -a \"$INTELLIJ\""
+    fi
+    GOGLAND=`ls -1d /Applications/Gogland\ * | tail -n1`
+    if [ -d "$GOGLAND" ]; then
+        alias gogland="open -a \"$GOGLAND\""
+    fi
 
 elif [ "linux-gnu" == $OSTYPE ] ; then
 
