@@ -14,6 +14,7 @@
 (add-to-list 'load-path "~/.elisp/csharp-mode")
 (add-to-list 'load-path "~/.elisp/direx-el")
 (add-to-list 'load-path "~/.elisp/go-mode")
+(add-to-list 'load-path "~/.elisp/yaml-mode")
 (add-to-list 'load-path "~/.elisp/markdown-mode")
 (add-to-list 'load-path "~/.elisp/slime")
 (add-to-list 'load-path "~/.elisp/swift-mode")
@@ -197,6 +198,11 @@ prompting for the sml command. sml-mode overrides this on load."
 
 (autoload 'csharp-mode "csharp-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
+
+;; YAML
+
+(require 'yaml-mode)
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 
 ;; Protocol Buffers
 
