@@ -12,5 +12,8 @@ lldb-history
 xcuserdata
 **/project.xcworkspace/xcshareddata
 
+__pycache__
+*.pyc
+
 .idea
 .iml
