@@ -15,6 +15,7 @@
 (add-to-list 'load-path "~/.elisp/direx-el")
 (add-to-list 'load-path "~/.elisp/go-mode")
 (add-to-list 'load-path "~/.elisp/yaml-mode")
+(add-to-list 'load-path "~/.elisp/emacs-hcl-mode")
 (add-to-list 'load-path "~/.elisp/markdown-mode")
 (add-to-list 'load-path "~/.elisp/slime")
 (add-to-list 'load-path "~/.elisp/swift-mode")
@@ -203,6 +204,11 @@ prompting for the sml command. sml-mode overrides this on load."
 
 (require 'yaml-mode)
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+
+;; HCL
+
+(require 'hcl-mode)
+(add-to-list 'auto-mode-alist '("\\.tf\\'" . hcl-mode))
 
 ;; Protocol Buffers
 
