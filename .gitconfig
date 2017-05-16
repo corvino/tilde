@@ -34,6 +34,8 @@
     qs = !git log --date=local --pretty=format:'%h %H %ae %ad %s' | head -n 1 | sed 's/$//'
     amdate = "!f() { GIT_COMMITTER_DATE=\"$1\" git commit --amend --date=\"$1\"; }; f"
 
+    fa = fetch --all -pt
+    fp = fetch -pt
     sup = submodule update --init --recursive
     pusha = push -u --all
     pusht = push --tags
