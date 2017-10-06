@@ -36,6 +36,7 @@
 
     fa = fetch --all -pt
     fp = fetch -pt
+    ff = merge --ff-only
     sup = submodule update --init --recursive
     pusha = push -u --all
     pusht = push --tags
