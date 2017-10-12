@@ -34,6 +34,8 @@
     qs = !git log --date=local --pretty=format:'%h %H %ae %ad %s' | head -n 1 | sed 's/$//'
     amdate = "!f() { GIT_COMMITTER_DATE=\"$1\" git commit --amend --date=\"$1\"; }; f"
 
+    hd = rev-parse --verify HEAD
+    sd = log --pretty=format:'%h' -n 1
     fa = fetch --all -pt
     fp = fetch -pt
     ff = merge --ff-only
