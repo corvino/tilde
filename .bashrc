@@ -30,6 +30,7 @@ alias tag="ctags -e -R ."
 alias rbi='eval "$(rbenv init -)"'
 alias pyi='eval "$(pyenv init -)"'
 
+export GOPATH=~/code/go
 alias goc='go build'
 alias got='go test $(go list ./... | grep -v /vendor/)'
 alias gotag="find . -type f -name '*.go' | xargs ctags -e"
