@@ -4,15 +4,18 @@ parse_git_branch() {
     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/[\1]/'
 }
 
-case "$TERM" in
-#    xterm* ) export PS1='\[\033[31;1m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ ' ;;
-    xterm* ) export PS1='\[\033[31;1m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[0;31m\]$(parse_git_branch)\[\033[00m\]\$ ' ;;
-    *     ) export PS1='\u@\h:\w\$ ' ;;
-esac
+NUM_COLORS=$(tput colors)
 
-case "$TERM" in
-    xterm*|rxct* ) export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"' ;;
-esac
+if [ -n NUM_COLORS ]; then
+    case "$TERM" in
+        xterm* ) export PS1='\[\033[31;1m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[0;31m\]$(parse_git_branch)\[\033[00m\]\$ ' ;;
+        *     ) export PS1='\u@\h:\w\$ ' ;;
+    esac
+
+    case "$TERM" in
+        xterm*|rxct* ) export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"' ;;
+    esac
+fi
 
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
 export HISTCONTROL=ignoredups
@@ -27,8 +30,19 @@ alias con="tail -40 -f /var/log/system.log"
 
 alias tag="ctags -e -R ."
 
-alias rbi='eval "$(rbenv init -)"'
-alias pyi='eval "$(pyenv init -)"'
+#
+# Init script version managers
+#
+if [ -n "`which rbenv`" ]; then
+    eval "$(rbenv init -)"
+fi
+if [ -n "`which pyenv`" ]; then
+    eval "$(pyenv init -)"
+fi
+if [ -e "/usr/local/opt/nvm/nvm.sh" ]; then
+    export NVM_DIR="$HOME/.nvm"
+    . "/usr/local/opt/nvm/nvm.sh"
+fi
 
 export GOPATH=~/code/go
 alias goc='go build'
@@ -77,7 +91,19 @@ elif [ "linux-gnu" == $OSTYPE ] ; then
     fi
 fi
 
-sourcedir=~/.bashac
+sourcedir=~/.bashas
+if [ -d "$sourcedir" ]; then
+    files=`ls -a1 $sourcedir`
+    for file in $files; do
+        if [ -f "$sourcedir/$file" ]; then
+            . "$sourcedir/$file"
+        fi
+    done
+fi
+
+# Read through symbolic link to get actualy directory, then
+# source files in .bashas
+sourcedir="$( cd "$( dirname "`readlink ${BASH_SOURCE[0]}`" )" && pwd )/.bashas"
 if [ -d "$sourcedir" ]; then
     files=`ls -a1 $sourcedir`
     for file in $files; do
