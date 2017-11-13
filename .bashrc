@@ -82,6 +82,8 @@ if [[ $OSTYPE == "darwin"* ]]; then
         alias gogland="open -a \"$GOGLAND\""
     fi
 
+    alias brew-config="source brew-config"
+
 elif [ "linux-gnu" == $OSTYPE ] ; then
 
     eval `dircolors -b`

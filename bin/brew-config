@@ -1,0 +1,4 @@
+# source using back; . ~/bin/brew-config
+# Which is aliased in .bashrc, conveniently, to brew-config.
+
+export HOMEBREW_GITHUB_API_TOKEN=`security find-generic-password -a hombrew-github-token -w`
