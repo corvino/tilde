@@ -1,5 +1,9 @@
 #! /bin/bash
 
+# See https://furbo.org/2014/09/03/the-terminal/
+
+# I just ported Craig Hockenberry's script to bash for no good reason.
+
 cmd='ps axo pid,ppid,user,command'
 if [ -z "$1" ]; then
     $cmd
