@@ -15,6 +15,8 @@
 (add-to-list 'load-path "~/.elisp/direx-el")
 (add-to-list 'load-path "~/.elisp/go-mode")
 (add-to-list 'load-path "~/.elisp/yaml-mode")
+(add-to-list 'load-path "~/.elisp/graphql-mode")
+(add-to-list 'load-path "~/.elisp/emacs-request")
 (add-to-list 'load-path "~/.elisp/emacs-hcl-mode")
 (add-to-list 'load-path "~/.elisp/markdown-mode")
 (add-to-list 'load-path "~/.elisp/slime")
@@ -42,6 +44,9 @@
                 indent-tabs-mode nil
                 fill-column 72
                 show-trailing-whitespace t)
+
+(put 'upcase-region 'disabled nil)
+
 (if (eql system-type 'darwin)
     (progn
       (setq ns-command-modifier 'meta)
@@ -209,6 +214,11 @@ prompting for the sml command. sml-mode overrides this on load."
 
 (require 'hcl-mode)
 (add-to-list 'auto-mode-alist '("\\.tf\\'" . hcl-mode))
+
+;; GraphQL
+
+(require 'graphql-mode)
+(add-to-list 'auto-mode-alist '("\\.graphql\\'" . graphql-mode))
 
 ;; Protocol Buffers
 

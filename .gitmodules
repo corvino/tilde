@@ -22,3 +22,9 @@
 [submodule ".elisp/emacs-hcl-mode"]
 	path = .elisp/emacs-hcl-mode
 	url = git@github.com:syohex/emacs-hcl-mode.git
+[submodule ".elisp/graphql-mode"]
+	path = .elisp/graphql-mode
+	url = https://github.com/davazp/graphql-mode.git
+[submodule ".elisp/emacs-request"]
+	path = .elisp/emacs-request
+	url = https://github.com/tkf/emacs-request.git
