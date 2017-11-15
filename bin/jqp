@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Pretty format and colorize JSON and pipe it to less.
+if [ 0 -eq $# ]; then
+    jq -C '.' | less -R
+elif [ 1 -eq $# ]; then
+    jq -C '.' "$1" | less -R
+else
+    echo "usage: jqc [file]"
+fi
