@@ -3,7 +3,7 @@
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 backup="$dir/BACKUP"
 
-files="bin .bash_profile .bashrc .emacs .elisp .gitconfig .gitexclude .vimrc .lldbinit .lldb .mongorc.js"
+files="bin .bash_profile .bashrc .emacs .elisp .gitconfig .gitexclude .vimrc .irbrc .lldbinit .lldb .mongorc.js"
 
 # Create the "backup" directory for existing files; but only if there
 # are existing files that aren't already symlinked appropriately. Fail

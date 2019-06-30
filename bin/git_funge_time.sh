@@ -15,7 +15,7 @@ if [ -z $1 ]; then
     exit -1
 fi
 
-if [ -z $2 ]; then
+if [[ -z $2 ]]; then
     echo "You must specify a commit date"
     exit -1
 fi

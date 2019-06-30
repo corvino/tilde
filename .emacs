@@ -45,6 +45,20 @@
                 fill-column 72
                 show-trailing-whitespace t)
 
+;; Restore emacs desktop and history on restart
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Emacs-Sessions.html
+;; https://www.emacswiki.org/emacs/SaveHist
+(when (display-graphic-p)
+  (desktop-save-mode 1)
+  (setq desktop-dirname "~/.emacs.d/")
+  (setq savehist-additional-variables '(kill-ring kmacro-ring))
+  (setq savehist-file "~/.emacs.d/savehist"))
+
+;; Restore proper \C-j/ret behavior by disabling `electric-indent-mode`
+;; enabled by default in 24.4. See
+;; http://git.savannah.gnu.org/cgit/emacs.git/tree/etc/NEWS.24
+(electric-indent-mode 0)
+
 (put 'upcase-region 'disabled nil)
 
 (if (eql system-type 'darwin)
@@ -67,16 +81,19 @@
 (global-set-key [f3] 'split-window-right)
 (global-set-key [f10] 'delete-window)
 
+;; Some macOS-like key bindings
+
+(global-set-key "\M-[" 'decrease-left-margin)
+(global-set-key "\M-]" 'increase-left-margin)
+(global-set-key "\M-z" 'undo)
+(global-set-key "\C-/" 'comment-region)
+(global-set-key "\M-/" 'uncomment-region)
+
 ;; Use \C-z as namespace for custom keybindings.
 
 (global-set-key "\C-z" nil)
 (global-set-key "\C-zl" 'goto-line)
-
 (global-set-key [?\C-z backspace] 'revert-buffer)
-(global-set-key "\C-z/" 'comment-region)
-(global-set-key "\C-z?" 'uncomment-region)
-(global-set-key "\C-z[" 'decrease-left-margin)
-(global-set-key "\C-z]" 'increase-left-margin)
 (global-set-key "\C-zk" 'compile)
 (global-set-key "\C-zd" 'gdb)
 (global-set-key "\C-zw" 'gdb-many-windows)
@@ -240,14 +257,13 @@ prompting for the sml command. sml-mode overrides this on load."
 (add-hook 'html-mode-hook
   '(lambda ()
      ;;(setq indent-tabs-mode nil)
-     (define-key html-mode-map "\C-j" 'insert-newline-and-indent-relative)
      (define-key html-mode-map "\t" 'indent-next-stop)
      (setq tab-stop-list (number-sequence 4 120 4))
      (setq tab-width 4)))
 
 (add-hook 'js-mode-hook
    '(lambda ()
-      (setq js-indent-level 4)))
+      (setq js-indent-level 2)))
 
 ;; Custom functions
 
