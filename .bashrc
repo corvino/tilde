@@ -41,7 +41,8 @@ if [ -n "`which pyenv`" ]; then
 fi
 if [ -e "/usr/local/opt/nvm/nvm.sh" ]; then
     export NVM_DIR="$HOME/.nvm"
-    . "/usr/local/opt/nvm/nvm.sh"
+    [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+    [ -s "/usr/local/opt/nvm/etc/bash_completion" ] && . "/usr/local/opt/nvm/etc/bash_completion"  # This loads nvm bash_completion
 fi
 
 export GOPATH=~/code/go
@@ -65,6 +66,17 @@ if [[ $OSTYPE == "darwin"* ]]; then
         man -t $1 | open -f -a Preview
     }
 
+    tcplisten() {
+        # So there is no more google-ing for
+        # https://stackoverflow.com/questions/4421633/who-is-listening-on-a-given-tcp-port-on-mac-os-x
+        if [ "$1" -gt "-1" ]; then
+           lsof -nP -i4TCP:$1 | grep LISTEN
+        else
+           lsof -nP -i4TCP | grep LISTEN
+        fi
+    }
+
+    export PATH=$PATH:/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/
     export CLICOLOR=1
     export JAVA_HOME=/Library/Java/Home
 
@@ -73,11 +85,11 @@ if [[ $OSTYPE == "darwin"* ]]; then
     alias mvi='open -a MacVim'
     alias mn=man_preview
 
-    INTELLIJ=`ls -1d /Applications/IntelliJ\ * | tail -n1`
+    INTELLIJ=`ls -1d /Applications/IntelliJ\ * 2>/dev/null | tail -n1`
     if [ -d "$INTELLIJ" ]; then
         alias intellij="open -a \"$INTELLIJ\""
     fi
-    GOGLAND=`ls -1d /Applications/Gogland\ * | tail -n1`
+    GOGLAND=`ls -1d /Applications/Gogland\ * 2>/dev/null | tail -n1`
     if [ -d "$GOGLAND" ]; then
         alias gogland="open -a \"$GOGLAND\""
     fi

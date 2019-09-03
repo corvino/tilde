@@ -3,7 +3,6 @@ command script import ~/.lldb/fsa.py
 command regex pod 's/^(.+)$/expression -O -- [[NSString alloc] initWithData:%1 encoding:4]/' -h 'Print NSData converted to NSString.'
 command regex poj 's/^(.+)$/expression -O -- [NSJSONSerialization JSONObjectWithData:%1 options:0 error:nil]/' -h 'Print NSData converted to a JSON object.'
 
-command alias rvl_sim expr (void*)dlopen("/Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/libReveal.dylib", 0x2);
-command alias rvl_dev expr (void*)dlopen([(NSString*)[(NSBundle*)[NSBundle mainBundle] pathForResource:@"libReveal" ofType:@"dylib"] cStringUsingEncoding:0x4], 0x2);
-command alias rvl_start expr (void)[(NSNotificationCenter*)[NSNotificationCenter defaultCenter] postNotificationName:@"IBARevealRequestStart" object:nil];
-command alias rvl_stop expr (void)[(NSNotificationCenter*)[NSNotificationCenter defaultCenter] postNotificationName:@"IBARevealRequestStop" object:nil];
+### Reveal LLDB commands support - DO NOT MODIFY
+command script import /Users/vino/Library/Application\ Support/Reveal/RevealServerCommands.py
+###

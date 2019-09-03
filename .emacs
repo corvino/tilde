@@ -14,8 +14,8 @@
 (add-to-list 'load-path "~/.elisp/csharp-mode")
 (add-to-list 'load-path "~/.elisp/direx-el")
 (add-to-list 'load-path "~/.elisp/go-mode")
-(add-to-list 'load-path "~/.elisp/yaml-mode")
-(add-to-list 'load-path "~/.elisp/graphql-mode")
+;(add-to-list 'load-path "~/.elisp/yaml-mode")
+;(add-to-list 'load-path "~/.elisp/graphql-mode")
 (add-to-list 'load-path "~/.elisp/emacs-request")
 (add-to-list 'load-path "~/.elisp/emacs-hcl-mode")
 (add-to-list 'load-path "~/.elisp/markdown-mode")
@@ -57,7 +57,9 @@
 ;; Restore proper \C-j/ret behavior by disabling `electric-indent-mode`
 ;; enabled by default in 24.4. See
 ;; http://git.savannah.gnu.org/cgit/emacs.git/tree/etc/NEWS.24
-(electric-indent-mode 0)
+;; https://emacsredux.com/blog/2013/03/29/automatic-electric-indentation/
+(if (fboundp 'electric-indent-mode)
+    (electric-indent-mode 0))
 
 (put 'upcase-region 'disabled nil)
 
@@ -86,8 +88,8 @@
 (global-set-key "\M-[" 'decrease-left-margin)
 (global-set-key "\M-]" 'increase-left-margin)
 (global-set-key "\M-z" 'undo)
-(global-set-key "\C-/" 'comment-region)
-(global-set-key "\M-/" 'uncomment-region)
+(global-set-key [?\C-/] 'comment-region)
+(global-set-key [?\M-/] 'uncomment-region)
 
 ;; Use \C-z as namespace for custom keybindings.
 
@@ -133,19 +135,19 @@
           (lambda ()
             (local-set-key (kbd "C-c C-f") 'slime-eval-buffer)))
 
-(require 'direx)
-;; https://github.com/m2ym/direx-el
-;; https://www.emacswiki.org/emacs/NeoTree
-;; https://github.com/jaypei/emacs-neotree
-(add-hook 'dired-load-hook
-          (function (lambda  ()
-                      (define-key dired-mode-map "k" 'dired-kill-subdir)
-                      (define-key dired-mode-map "K" 'dired-do-kill-lines))))
-(global-set-key (kbd "C-x C-j") 'direx:jump-to-directory)
-(global-set-key (kbd "C-z C-j") 'direx:find-directory)
-(setq direx:leaf-icon "  "
-      direx:open-icon "▾ "
-      direx:closed-icon "▸ ")
+;; (require 'direx)
+;; ;; https://github.com/m2ym/direx-el
+;; ;; https://www.emacswiki.org/emacs/NeoTree
+;; ;; https://github.com/jaypei/emacs-neotree
+;; (add-hook 'dired-load-hook
+;;           (function (lambda  ()
+;;                       (define-key dired-mode-map "k" 'dired-kill-subdir)
+;;                       (define-key dired-mode-map "K" 'dired-do-kill-lines))))
+;; (global-set-key (kbd "C-x C-j") 'direx:jump-to-directory)
+;; (global-set-key (kbd "C-z C-j") 'direx:find-directory)
+;; (setq direx:leaf-icon "  "
+;;       direx:open-icon "▾ "
+;;       direx:closed-icon "▸ ")
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -224,18 +226,18 @@ prompting for the sml command. sml-mode overrides this on load."
 
 ;; YAML
 
-(require 'yaml-mode)
-(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+;;(require 'yaml-mode)
+;;(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 
 ;; HCL
 
-(require 'hcl-mode)
-(add-to-list 'auto-mode-alist '("\\.tf\\'" . hcl-mode))
+;;(require 'hcl-mode)
+;;(add-to-list 'auto-mode-alist '("\\.tf\\'" . hcl-mode))
 
 ;; GraphQL
 
-(require 'graphql-mode)
-(add-to-list 'auto-mode-alist '("\\.graphql\\'" . graphql-mode))
+;; (require 'graphql-mode)
+;; (add-to-list 'auto-mode-alist '("\\.graphql\\'" . graphql-mode))
 
 ;; Protocol Buffers
 

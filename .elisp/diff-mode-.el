@@ -4,17 +4,17 @@
 ;; Description: Extensions to `diff-mode.el'.
 ;; Author: Drew Adams
 ;; Maintainer: Drew Adams (concat "drew.adams" "@" "oracle" ".com")
-;; Copyright (C) 2004-2016, Drew Adams, all rights reserved.
+;; Copyright (C) 2004-2018, Drew Adams, all rights reserved.
 ;; Created: Mon Nov 08 16:36:09 2004
 ;; Version: 0
 ;; Package-Requires: ()
-;; Last-Updated: Thu Dec 31 12:54:01 2015 (-0800)
+;; Last-Updated: Fri Apr 27 10:54:57 2018 (-0700)
 ;;           By: dradams
-;;     Update #: 712
-;; URL: http://www.emacswiki.org/diff-mode-.el
-;; Doc URL: http://www.emacswiki.org/DiffEnhancements
+;;     Update #: 761
+;; URL: https://www.emacswiki.org/emacs/download/diff-mode-.el
+;; Doc URL: https://www.emacswiki.org/emacs/DiffEnhancements
 ;; Keywords: data, matching, tools, unix, local, font, face
-;; Compatibility: GNU Emacs: 21.x, 22.x, 23.x, 24.x, 25.x
+;; Compatibility: GNU Emacs: 21.x, 22.x, 23.x, 24.x, 25.x, 26.x
 ;;
 ;; Features that might be required by this library:
 ;;
@@ -52,10 +52,6 @@
 ;;
 ;;    `diff-file1-hunk-header', `diff-file2-hunk-header'.
 ;;
-;;  New user options defined here:
-;;
-;;    `diff-file1-hunk-header-face', `diff-file2-hunk-header-face'.
-;;
 ;;
 ;;  ***** NOTE: The following faces defined in `diff-mode.el' have
 ;;              been REDEFINED HERE:
@@ -66,10 +62,11 @@
 ;;    `diff-indicator-removed', `diff-nonexistent', `diff-removed'.
 ;;
 ;;
-;;  ***** NOTE: The following variable defined in `diff-mode.el' has
+;;  ***** NOTE: The following variables defined in `diff-mode.el' have
 ;;              been REDEFINED HERE:
 ;;
-;;    `diff-font-lock-keywords'.
+;;    `diff-context-mid-hunk-header-re', `diff-font-lock-keywords',
+;;    `diff-hunk-header-re-unified'.
 ;;
 ;;
 ;;  This library should be loaded *before* library `diff-mode.el'.
@@ -80,6 +77,10 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2018/04/27 dadams
+;;     Added copies of vanilla constants diff-hunk-header-re-unified, diff-context-mid-hunk-header-re.
+;; 2018/04/26 dadams
+;;     diff-font-lock-keywords: Updated for Emacs 26 - no obsolete face names.
 ;; 2011/02/11 dadams
 ;;     Better defaults for faces on dark background.
 ;; 2011/01/04 dadams
@@ -115,7 +116,6 @@
 ;;; Code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 ;;; Define some additional faces.
 ;;;###autoload
@@ -189,30 +189,75 @@
                  (t (:foreground "DarkMagenta"))) 'now)
  )
 
-;;; The only real difference here now from the standard Emacs 22 version is the
-;;; use of diff-file1* and diff-file2*.
+;; No changes from original constants (Emacs 22 - Emacs 27).
+;; Add them here because used in `diff-font-lock-keywords' setting.
+;;
+(defconst diff-hunk-header-re-unified
+  "^@@ -\\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? \\+\\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? @@")
+(defconst diff-context-mid-hunk-header-re
+  "--- \\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? ----$")
+
+;; Differs from standard Emacs 22 version in the use of diff-file1* and diff-file2*.
+;;
 (defvar diff-font-lock-keywords
-  `(
-    ("^\\(@@ -[0-9,]+ \\+[0-9,]+ @@\\)\\(.*\\)$" ;unified
-     (1 diff-hunk-header-face) (2 diff-function-face))
-    ("^\\(\\*\\{15\\}\\)\\(.*\\)$"      ;context
-     (1 diff-hunk-header-face) (2 diff-function-face))
-    ("^\\*\\*\\* .+ \\*\\*\\*\\*". diff-file1-hunk-header-face) ;context
-    ("^--- .+ ----$" . diff-file2-hunk-header-face) ;context
-    ("^[0-9,]+[acd][0-9,]+$" . diff-hunk-header-face) ; normal
-    ("^---$" . diff-hunk-header-face)   ;normal
-    ("^\\(---\\|\\+\\+\\+\\|\\*\\*\\*\\) \\(\\S-+\\)\\(.*[^*-]\\)?\n"
-     (0 diff-header-face) (2 diff-file-header-face prepend))
-    ("^\\([-<]\\)\\(.*\n\\)" (1 diff-indicator-removed-face) (2 diff-removed-face))
-    ("^\\([+>]\\)\\(.*\n\\)" (1 diff-indicator-added-face) (2 diff-added-face))
-    ("^\\(!\\)\\(.*\n\\)" (1 diff-indicator-changed-face) (2 diff-changed-face))
-    ("^Index: \\(.+\\).*\n" (0 diff-header-face) (1 diff-index-face prepend))
-    ("^Only in .*\n" . diff-nonexistent-face)
-    ("^\\(#\\)\\(.*\\)"
-     (1 (if (facep 'font-lock-comment-delimiter-face)
-            'font-lock-comment-face))
-     (2 font-lock-comment-face))
-    ("^[^-=+*!<>#].*\n" (0 diff-context-face))))
+  (if (< emacs-major-version 26)
+      `(
+        ("^\\(@@ -[0-9,]+ \\+[0-9,]+ @@\\)\\(.*\\)$" ;unified
+         (1 diff-hunk-header-face) (2 diff-function-face))
+        ("^\\(\\*\\{15\\}\\)\\(.*\\)$"  ;context
+         (1 diff-hunk-header-face) (2 diff-function-face))
+        ("^\\*\\*\\* .+ \\*\\*\\*\\*". diff-file1-hunk-header-face) ;context
+        ("^--- .+ ----$" . diff-file2-hunk-header-face)   ;context
+        ("^[0-9,]+[acd][0-9,]+$" . diff-hunk-header-face) ; normal
+        ("^---$" . diff-hunk-header-face)                 ;normal
+        ("^\\(---\\|\\+\\+\\+\\|\\*\\*\\*\\) \\(\\S-+\\)\\(.*[^*-]\\)?\n"
+         (0 diff-header-face) (2 diff-file-header-face prepend))
+        ("^\\([-<]\\)\\(.*\n\\)" (1 diff-indicator-removed-face) (2 diff-removed-face))
+        ("^\\([+>]\\)\\(.*\n\\)" (1 diff-indicator-added-face) (2 diff-added-face))
+        ("^\\(!\\)\\(.*\n\\)" (1 diff-indicator-changed-face) (2 diff-changed-face))
+        ("^Index: \\(.+\\).*\n" (0 diff-header-face) (1 diff-index-face prepend))
+        ("^Only in .*\n" . diff-nonexistent-face)
+        ("^\\(#\\)\\(.*\\)"
+         (1 (if (facep 'font-lock-comment-delimiter-face)
+                'font-lock-comment-face))
+         (2 font-lock-comment-face))
+        ("^[^-=+*!<>#].*\n" (0 diff-context-face)))
+    `(
+      (,(concat "\\(" diff-hunk-header-re-unified "\\)\\(.*\\)$")
+        (1 'diff-hunk-header) (6 'diff-function))
+      ("^\\(\\*\\{15\\}\\)\\(.*\\)$" (1 'diff-hunk-header) (2 'diff-function)) ;context
+      ("^\\*\\*\\* .+ \\*\\*\\*\\*". 'diff-file1-hunk-header) ;context
+      ("^--- .+ ----$" . 'diff-file2-hunk-header)             ;context
+      (,diff-context-mid-hunk-header-re . 'diff-hunk-header)  ;context
+      ("^[0-9,]+[acd][0-9,]+$" . 'diff-hunk-header)           ; normal
+      ("^---$" . 'diff-hunk-header)                           ;normal
+      ;; For file headers, accept files with spaces, but be careful to rule
+      ;; out false-positives when matching hunk headers.
+      ("^\\(---\\|\\+\\+\\+\\|\\*\\*\\*\\) \\([^\t\n]+?\\)\\(?:\t.*\\| \\(\\*\\*\\*\\*\\|----\\)\\)?\n"
+       (0 'diff-header) (2 (if (not (match-end 3)) 'diff-file-header) prepend))
+      ("^\\([-<]\\)\\(.*\n\\)" (1 'diff-indicator-removed) (2 'diff-removed))
+      ("^\\([+>]\\)\\(.*\n\\)" (1 'diff-indicator-added) (2 'diff-added))
+      ("^\\(!\\)\\(.*\n\\)"
+       (1 (if diff-use-changed-face
+              'diff-indicator-changed
+            ;; Otherwise, search for `diff-context-mid-hunk-header-re'.  If the line of context diff
+            ;; is above, use `diff-removed'.  If below, use `diff-added'.
+            (save-match-data
+              (let ((limit  (save-excursion (diff-beginning-of-hunk))))
+                (if (save-excursion (re-search-backward diff-context-mid-hunk-header-re limit t))
+                    'diff-indicator-added
+                  'diff-indicator-removed)))))
+       (2 (if diff-use-changed-face
+              'diff-changed
+            (save-match-data            ; Same method as above.
+              (let ((limit  (save-excursion (diff-beginning-of-hunk))))
+                (if (save-excursion (re-search-backward diff-context-mid-hunk-header-re limit t))
+                    'diff-added
+                  'diff-removed))))))
+      ("^\\(?:Index\\|revno\\): \\(.+\\).*\n" (0 'diff-header) (1 'diff-index prepend))
+      ("^Only in .*\n" . 'diff-nonexistent)
+      ("^\\(#\\)\\(.*\\)" (1 font-lock-comment-delimiter-face) (2 font-lock-comment-face))
+      ("^[^-=+*!<>#].*\n" (0 'diff-context)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 
