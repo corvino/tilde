@@ -21,12 +21,18 @@ fi
 export HISTCONTROL=ignoredups
 shopt -s checkwinsize
 
+alias less="less -R"
+alias tree="tree -C"
+
 alias ll="ls -lah"
 alias lq="ls -1"
 alias la="ls -a1"
 
 alias grpr='grep [Ee][Rr][Rr][Oo][Rr]'
 alias con="tail -40 -f /var/log/system.log"
+
+# 'open -a Emacs' used to work nicely but now appears borked
+alias em='emacsclient -n'
 
 alias tag="ctags -e -R ."
 
@@ -79,8 +85,8 @@ if [[ $OSTYPE == "darwin"* ]]; then
     export PATH=$PATH:/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/
     export CLICOLOR=1
     export JAVA_HOME=/Library/Java/Home
+    export BASH_SILENCE_DEPRECATION_WARNING=1
 
-    alias em='open -a Emacs'
     alias emacsclient='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient'
     alias mvi='open -a MacVim'
     alias mn=man_preview
