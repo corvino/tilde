@@ -17,6 +17,22 @@ it is needed and exists, the script does not attempt to backup or link.
 
 The setup process is simple: clone and run setup.sh.
 
+Remote Tasks
+------------
+Ansible is nice for grooming remote hosts.
+
+The first playbook to run is one to push authorized keys to the remote host, in this case installKeys.yml. This requires [sshpass](https://gist.github.com/arunoda/7790979), which can be installed with:
+
+    brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb
+    # or
+    apt-get install sshpass
+
+Then run:
+
+    # The comma causes Ansible to interpret the inventory as hostname/ip adress.
+    # -k (--ask-pass) causes ansible to ask for connection password
+    ansible-playbook -i <address>, installKeys.yml -k
+
 Emacs
 -----
 

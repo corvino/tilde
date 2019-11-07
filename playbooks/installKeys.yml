@@ -1,0 +1,11 @@
+---
+- name: Add authroized keys to specified hosts
+  hosts: all
+  tasks:
+    - name: Set up multiple authorized keys
+      authorized_key:
+        user: vino
+        key: '{{ item }}'
+      with_file:
+        - authorized_keys/athena.pub
+        - authorized_keys/hermes.pub
