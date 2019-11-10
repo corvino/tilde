@@ -5,28 +5,54 @@
 
 read -d '' AWK_SCRIPT << 'EOF'
 {
-    if ($1 ~ /Author:/) {a = $2 " " $3};
-    if ($1 ~ /Date:/) {b = $2 " " $3 " " $4 " " $5 " " $6};
-    if (a != "" && b !="") {
-        if (a in authors)
-        {  c = authors[a];
-            c++;
-            authors[a] = c;
-        }
-        else
-        {
-            authors[a] = 1;
-            dates[a] = b;
-        }
-        a = "";
-        b = "";
+    date = $1
+    $1 = ""
+    author = $0
+    if (author in authors) {
+        count = authors[$0]
+        count++
+        authors[author] = count
+    } else {
+        authors[author] = 1
+        dates[author] = date
     }
 }
 END {
-    for (a in authors)
-        # backslash needs to be escaped to survive the read step
-        print (a "\\t" authors[a] "\\t" dates[a]);
+    for (author in authors) {
+        count = authors[author]
+
+        cmd = "date -r " dates[author] " '+%Y.%m.%d %H:%M'"
+        ((cmd)|getline date)
+
+        # We suck in some extraneous whitespace with $0, so trim it.
+        # Also, protect our separator from malicious authors.
+        gsub(/^[ \t]+/, "", author)
+        gsub(/[ \t]+$/, "", author)
+        gsub(/\\|+/, "_", author)
+
+        print (author "|" count "|" date);
+
+        # Not actually positive this is needed; maybe for a large number of authors?
+        close(cmd)
+    }
 }
 EOF
 
-git log "${1:-.}" | awk "${AWK_SCRIPT}"
+# Sort by count
+SORT_ORDER='BEGIN {FS = "|"} ; { printf "%10d|%s|%s\n", $2, $1, $3 }'
+PRINT_ORDER='BEGIN {FS = "|"} ; { printf "%s|%d|%s\n", $2, $1, $3 }'
+TARGET_PATH=$1
+
+if [[ "-d" == $1 ]]; then
+    #Sort by date
+    SORT_ORDER='BEGIN {FS = "|"} ; { print $3 "|" $1 "|" $2 }'
+    PRINT_ORDER='BEGIN {FS = "|"} ; { printf "%s|%d|%s\n", $2, $3, $1 }'
+    TARGET_PATH=$2
+fi
+
+git log --pretty=format:'%at %an' "${TARGET_PATH:-.}" \
+    | awk "${AWK_SCRIPT}" \
+    | awk "$SORT_ORDER" \
+    | sort -r \
+    | awk "$PRINT_ORDER" \
+    | column -t -s'|'
