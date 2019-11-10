@@ -82,12 +82,12 @@ if [[ $OSTYPE == "darwin"* ]]; then
         fi
     }
 
-    export PATH=$PATH:/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/
     export CLICOLOR=1
     export JAVA_HOME=/Library/Java/Home
     export BASH_SILENCE_DEPRECATION_WARNING=1
 
     alias emacsclient='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient'
+    alias code='"/Applications/Visual Studio Code.app//Contents/Resources/app/bin/code"'
     alias mvi='open -a MacVim'
     alias mn=man_preview
 
