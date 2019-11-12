@@ -45,7 +45,7 @@
     pusht = push --tags
     pushb = push --set-upstream
 
-    substats = "!f() { git-substats.sh; }; f"
+    substats = "!f() { git-sub-stats.sh; }; f"
     ffbranch = "!f() { git-ff-branch.sh; }; f"
     recent = "!f() { git-recent.sh \"$1\"; }; f"
 
