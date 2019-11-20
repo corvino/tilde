@@ -1,14 +1,19 @@
 [ -z "$PS1" ] && return   # If not running interactively, don't do anything
 
-parse_git_branch() {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/[\1]/'
+# Surround branch name in square brackets if in a git repo.
+# Otherwise do nothing.
+git_branch() {
+    BRANCH=$(git-branch-name.sh)
+    if [[ -n ${BRANCH} ]]; then
+        echo "[${BRANCH}]"
+    fi
 }
 
 NUM_COLORS=$(tput colors)
 
 if [ -n NUM_COLORS ]; then
     case "$TERM" in
-        xterm* ) export PS1='\[\033[31;1m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[0;31m\][$(git-branch-name.sh)]\[\033[00m\]\$ ' ;;
+        xterm* ) export PS1='\[\033[31;1m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[0;31m\]$(git_branch)\[\033[00m\]\$ ' ;;
         *     ) export PS1='\u@\h:\w\$ ' ;;
     esac
 
