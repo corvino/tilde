@@ -17,6 +17,28 @@ it is needed and exists, the script does not attempt to backup or link.
 
 The setup process is simple: clone and run setup.sh.
 
+Git Scripts
+-----------
+* **git-sub-stats.sh**
+  Uses find to traverse the tree for the CWD and find any `.git` directories, indicating git repos (possibly submodules). Outputs stats on those repos.
+  * _-o, --only-branches_
+    Only show repos that have branches checked out (no headless tag or commit checkouts).
+  * _-n, --no-current_
+    Does not show the CWD repo.
+  * _-c, --no-commit_
+    Adds a column with the commit hash for each repo.
+  * _-p, --preserve-separator_
+    Instead of pretty-formatting with `column`, leaves the fields separated by the more machine-friendly `:`. Useful for passing the output to other scripts, such as `git-sub-sync.sh`.
+* **git-sub-sync.sh**
+  Fetches and merges the git repos with the stdin input format of <subdirectory>:<branch>. Each line represents a repo to update to the latest version of the specified branch. Calls `git fetch`, `git checkout <branch>`, and `git merge` on each repository. Lines beginning with `#` are treated as comments and ignored.
+
+  This is compatible with output format of `git-sub-stats.sh -o -n -p`, which outputs three fields for each repo--the path to the subdirectory, the branch the repo is on, and the date of the last update. `git-sub-sync.sh` simply ignored additional fields after the first two.
+
+  Example:
+
+      git-sub-sync.sh < submodule-targets.data
+
+
 Remote Tasks
 ------------
 Ansible is nice for grooming remote hosts.
@@ -32,6 +54,10 @@ Then run:
     # The comma causes Ansible to interpret the inventory as hostname/ip adress.
     # -k (--ask-pass) causes ansible to ask for connection password
     ansible-playbook -i <address>, installKeys.yml -k
+
+To push .tilde and run setup to a remote machine:
+
+    ansible-playbook -v -i <address>, installTilde.yml
 
 Emacs
 -----
