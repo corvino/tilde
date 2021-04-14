@@ -66,7 +66,7 @@ alias dkl='docker logs -f $(docker ps -q)'
 
 alias ispark='PYSPARK_DRIVER_PYTHON=ipython pyspark'
 
-PATH=$PATH:~/.binac
+PATH=$PATH:~/bin:~/.binac
 
 #
 # System-specific stuff.
@@ -86,6 +86,8 @@ if [[ $OSTYPE == "darwin"* ]]; then
            lsof -nP -i4TCP | grep LISTEN
         fi
     }
+
+    PATH=/usr/local/smlnj/bin:$PATH
 
     export CLICOLOR=1
     export JAVA_HOME=/Library/Java/Home
@@ -137,3 +139,4 @@ if [ -d "$sourcedir" ]; then
         fi
     done
 fi
+

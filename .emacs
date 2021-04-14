@@ -6,9 +6,14 @@
 (if (and (fboundp 'tool-bar-mode) tool-bar-mode) (tool-bar-mode 0))
 (if (and (fboundp 'scroll-bar-mode) scroll-bar-mode) (scroll-bar-mode nil))
 
-(let ((new-paths (list (expand-file-name "~/.binac") "/usr/local/bin")))
+(let ((new-paths (list (expand-file-name "~/.binac") )))
   (setenv "PATH" (concat (mapconcat 'identity new-paths ":") ":" (getenv "PATH")))
   (setq exec-path (append new-paths exec-path)))
+
+(if (string-equal "darwin" (symbol-name system-type))
+    (let ((new-paths (list "/usr/local/bin" "/usr/local/smlnj/bin")))
+      (setenv "PATH" (concat (mapconcat 'identity new-paths ":") ":" (getenv "PATH")))
+      (setq exec-path (append new-paths exec-path))))
 
 (add-to-list 'load-path "~/.elisp")
 (add-to-list 'load-path "~/.elisp/csharp-mode")
@@ -192,23 +197,26 @@
 
 (autoload 'sml-mode "sml-mode" "Major mode for editing SML." t)
 (add-to-list 'auto-mode-alist '("\\.\\(sml\\|sig\\)\\'" . sml-mode))
-
-(defun sml-cmd-override ()
-  "Override sml--read-run-cmd to specify the sml command."
-  '("/usr/local/bin/sml" "" ""))
-
 (add-hook 'sml-mode-hook
-          (lambda()
-            (defalias 'sml--read-run-cmd 'sml-cmd-override)))
+          (lambda ()
+            (local-set-key "\C-zr" 'run-sml)))
 
-;; Allow sml-run/run-sml before loading sml-mode.
-(defalias 'run-sml 'sml-run)
-(defun sml-run ()
-  "Load sml-mode and run sml-run with sml-cmd-override to avoid
-prompting for the sml command. sml-mode overrides this on load."
-  (interactive)
-  (load "sml-mode")
-  (apply 'sml-run (sml-cmd-override)))
+;; (defun sml-cmd-override ()
+;;   "Override sml--read-run-cmd to specify the sml command."
+;;   '("/usr/local/smlnj/bin/sml" "" ""))
+
+;; (add-hook 'sml-mode-hook
+;;           (lambda()
+;;             (defalias 'sml--read-run-cmd 'sml-cmd-override)))
+
+;; ;; Allow sml-run/run-sml before loading sml-mode.
+;; (defalias 'run-sml 'sml-run)
+;; (defun sml-run ()
+;;   "Load sml-mode and run sml-run with sml-cmd-override to avoid
+;; prompting for the sml command. sml-mode overrides this on load."
+;;   (interactive)
+;;   (load "sml-mode")
+;;   (apply 'sml-run (sml-cmd-override)))
 
 ;; Go
 
@@ -371,3 +379,4 @@ current buffer's directory."
      (lambda (x)
        (load-file x))
      (directory-files "~/.elispac" t ".el$")))
+(put 'downcase-region 'disabled nil)
