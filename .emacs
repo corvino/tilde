@@ -71,7 +71,19 @@
 (if (eql system-type 'darwin)
     (progn
       (setq ns-command-modifier 'meta)
-      (setq ns-pop-up-frames nil)))
+      (setq ns-pop-up-frames nil)
+      (if (eq window-system nil)
+          ;; macOS terminal is weird.
+          (progn
+            ;; The terminal has started being wonky when pasting from
+            ;; the clipboard. Workaround by defining an emacs keybinding
+            ;; that invokes the pbpaste command.
+            (defun pbpaste ()
+              "Paste for macOS clipboard."
+              (interactive)
+              (interactive)
+              (insert (shell-command-to-string "pbpaste")))
+            (global-set-key "\M-i" 'pbpaste)))))
 
 (if (fboundp 'paren-set-mode)
     (paren-set-mode 'sexp)
