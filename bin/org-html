@@ -1,0 +1,41 @@
+#! /usr/bin/env bash
+
+function error_exit() {
+    echo "$1" 1>&2
+    exit 1
+}
+
+function abs_file_path {
+    if [[ -d "$1" ]]; then
+        pushd "$1" >/dev/null
+        pwd
+        popd >/dev/null
+    elif [[ -e "$1" ]]; then
+        pushd "$(dirname "$1")" >/dev/null
+        echo "$(pwd)/$(basename "$1")"
+        popd >/dev/null
+    else
+        return 1
+    fi
+}
+
+if [ 2 == "$#" ]; then
+    if [ "/" = ${2:0:1} ]; then
+        target="$(abs_file_path "$(dirname "$2")")"
+    else
+        target="`pwd`/$2"
+    fi
+elif [ 1 == "$#" ]; then
+    filename="$(basename -- "$1")"
+    extension="${filename##*.}"
+    target="`pwd`/${filename%.*}.html"
+else
+    error_exit "usage: org-html source_file [target_file]"
+fi
+
+source=$(abs_file_path $1)
+if [ "$?" != "0" ]; then
+    error_exit "$1 does not exist" >&2
+fi
+
+emacs "$source" --batch --eval "(org-export-to-file 'html \"${target}\")"
