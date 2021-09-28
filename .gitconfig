@@ -13,9 +13,6 @@
     warnambiguousrefs = false
     editor = emacs
 
-[push]
-    default = simple
-
 [alias]
     plog = log --pretty=format:'%h %ae %s' --graph
     tlog = log --date=local --pretty=format:'%h %ae %ad %s' --graph
@@ -31,6 +28,9 @@
     ksdiff = difftool -y -t Kaleidoscope
     # Thanks @jimcorreia!
     ksshow = "!showrev () { rev=${1:-HEAD}; git ksdiff $rev~1 $rev; }; showrev $1"
+
+    qamend = commit --amend --no-edit
+    irebase = rebase -i --root
 
     qs = !git log --date=local --pretty=format:'%h %H %ae %ad %s' | head -n 1 | sed 's/$//'
     amdate = "!f() { GIT_COMMITTER_DATE=\"$1\" git commit --amend --date=\"$1\"; }; f"
@@ -52,10 +52,19 @@
     ss = substats
     ffb = ffbranch
 
+[credential]
+	helper = osxkeychain
+[init]
+	defaultBranch = main
+[pull]
+	ff = only
+[push]
+    default = simple
+
+# Diff/Merge
+
 [mergetool]
     keepBackup = true
-
-# Diff/Merge Tools
 
 [difftool "Kaleidoscope"]
     cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
@@ -76,5 +85,3 @@
 [mergetool "sourcetree"]
     cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
     trustExitCode = true
-[credential]
-	helper = osxkeychain

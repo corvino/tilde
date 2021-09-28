@@ -19,5 +19,8 @@ __pycache__
 .iml
 
 *.vagrant
+
+terraform.tfstate
 .terraform
+.terraform.lock.hcl
 *.tfstate.backup
