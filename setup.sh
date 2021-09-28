@@ -48,3 +48,12 @@ for file in $files; do
     fi
     echo "  $file"
 done
+
+# These symlinks are handy, in part because these directores are
+# relatively hard to find.
+if [[ "darwin"* == $OSTYPE ]]; then
+    echo "Creating symlinks for macOS"
+
+    ln -s ~/Library/Application\ Support/Code/User ~/vscode-settings
+    ln -s ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/drive
+fi
