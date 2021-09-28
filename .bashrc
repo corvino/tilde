@@ -9,6 +9,10 @@ git_branch() {
     fi
 }
 
+dockerb() {
+    docker exec -it $1 /bin/bash
+}
+
 NUM_COLORS=$(tput colors)
 
 if [ -n NUM_COLORS ]; then
@@ -36,24 +40,27 @@ alias la="ls -a1"
 alias grpr='grep [Ee][Rr][Rr][Oo][Rr]'
 alias con="tail -40 -f /var/log/system.log"
 
-# 'open -a Emacs' used to work nicely but now appears borked
-alias em='emacsclient -n'
+alias em="open -a Emacs"
 
 alias tag="ctags -e -R ."
 
 #
 # Init script version managers
 #
+
+if [[ -f /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 if [ -n "`which rbenv`" ]; then
     eval "$(rbenv init -)"
 fi
 if [ -n "`which pyenv`" ]; then
     eval "$(pyenv init -)"
 fi
-if [ -e "/usr/local/opt/nvm/nvm.sh" ]; then
+if [ -e "/opt/homebrew/opt/nvm/nvm.sh" ]; then
     export NVM_DIR="$HOME/.nvm"
-    [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-    [ -s "/usr/local/opt/nvm/etc/bash_completion" ] && . "/usr/local/opt/nvm/etc/bash_completion"  # This loads nvm bash_completion
+    [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+    [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 fi
 
 export GOPATH=~/code/go
@@ -102,12 +109,28 @@ if [[ $OSTYPE == "darwin"* ]]; then
     if [ -d "$INTELLIJ" ]; then
         alias intellij="open -a \"$INTELLIJ\""
     fi
-    GOGLAND=`ls -1d /Applications/Gogland\ * 2>/dev/null | tail -n1`
-    if [ -d "$GOGLAND" ]; then
-        alias gogland="open -a \"$GOGLAND\""
-    fi
 
-    alias brew-config="source brew-config"
+    DO_TOKEN=`security find-generic-password -a digital-ocean-token -w 2> /dev/null`
+    if ! [ -z $DO_TOKEN ]; then
+        # Setup Enviornment for Terraform to access Digital Ocean with account credentials.
+        #
+        # To setup ed25519 key, see:
+        # https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-2
+
+        export DO_TOKEN
+
+        MD5_FINGERPRINT=`ssh-keygen -E md5 -lf ~/.ssh/id_ed25519.pub | awk '{print $2}'`
+
+        export DO_SSH_FINGERPRINT=${MD5_FINGERPRINT:4}
+        export DO_TOKEN=`security find-generic-password -a digital-ocean-token -w`
+        export DO_SSH_FINGERPRINT=${MD5_FINGERPRINT:4}
+        export DO_PAT=$DO_TOKEN
+
+        export TF_VAR_ssh_fingerprint=${MD5_FINGERPRINT:4}
+        export TF_VAR_do_token=$DO_TOKEN
+        export TF_VAR_pvt_key=~/.ssh/id_ed25519
+        export TF_VAR_pub_key=~/.ssh/id_ed25519.pub
+    fi
 
 elif [ "linux-gnu" == $OSTYPE ] ; then
 
@@ -139,4 +162,3 @@ if [ -d "$sourcedir" ]; then
         fi
     done
 fi
-
