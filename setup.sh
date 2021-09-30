@@ -51,9 +51,9 @@ done
 
 # These symlinks are handy, in part because these directores are
 # relatively hard to find.
-if [[ "darwin"* == $OSTYPE ]]; then
+if [[ $OSTYPE == "darwin"* ]]; then
     echo "Creating symlinks for macOS"
 
-    ln -s ~/Library/Application\ Support/Code/User ~/vscode-settings
-    ln -s ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/drive
+    ln -sfh ~/Library/Application\ Support/Code/User ~/vscode-settings
+    ln -sfh ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/drive
 fi
