@@ -13,6 +13,25 @@ dockerb() {
     docker exec -it $1 /bin/bash
 }
 
+command_exists() {
+    return $(command -v "$1" &> /dev/null)
+}
+
+path_contains() {
+    if [[ $PATH =~ ^"$1":|:"$1":|:"$1"$ ]]; then
+        return $(true)
+    else
+        return $(false)
+    fi
+}
+
+augment_path() {
+    if ! $(path_contains "$1"); then
+    echo "augment" > $(tty)
+        PATH="$1:$PATH"
+    fi
+}
+
 NUM_COLORS=$(tput colors)
 
 if [ -n NUM_COLORS ]; then
@@ -48,19 +67,27 @@ alias tag="ctags -e -R ."
 # Init script version managers
 #
 
-if [[ -f /opt/homebrew/bin/brew ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+# if command -v brew &> /dev/null; then
+if $(command_exists brew); then
+    HOMEBREW_PREFIX="$(brew --prefix)"
+
+    eval "$($HOMEBREW_PREFIX/bin/brew shellenv)"
+
+    augment_path "$HOMEBREW_PREFIX/bin"
+
+    NVM="$HOMEBREW_PREFIX/opt/nvm"
+    if [ -e "$NVM/nvm.sh" ]; then
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM/nvm.sh" ] && . "$NVM/nvm.sh"  # This loads nvm
+        [ -s "$NVM/etc/bash_completion.d/nvm" ] && . "$NVM/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+    fi
 fi
-if [ -n "`which rbenv`" ]; then
+
+if $(command_exists rbenv); then
     eval "$(rbenv init -)"
 fi
-if [ -n "`which pyenv`" ]; then
+if $(command_exists pyenv); then
     eval "$(pyenv init -)"
-fi
-if [ -e "/opt/homebrew/opt/nvm/nvm.sh" ]; then
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-    [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 fi
 
 export GOPATH=~/code/go
@@ -111,7 +138,7 @@ if [[ $OSTYPE == "darwin"* ]]; then
     fi
 
     DO_TOKEN=`security find-generic-password -a digital-ocean-token -w 2> /dev/null`
-    if ! [ -z $DO_TOKEN ]; then
+    if ! [ -z $DO_TOKEN ] && [ -e ~/.ssh/id_ed25519.pub ]; then
         # Setup Enviornment for Terraform to access Digital Ocean with account credentials.
         #
         # To setup ed25519 key, see:
@@ -162,3 +189,5 @@ if [ -d "$sourcedir" ]; then
         fi
     done
 fi
+
+export PATH
