@@ -27,7 +27,6 @@ path_contains() {
 
 augment_path() {
     if ! $(path_contains "$1"); then
-    echo "augment" > $(tty)
         PATH="$1:$PATH"
     fi
 }
@@ -67,13 +66,15 @@ alias tag="ctags -e -R ."
 # Init script version managers
 #
 
+if [ -e /opt/homebrew/bin/brew ]; then
+    augment_path /opt/homebrew/bin
+fi
+
 # if command -v brew &> /dev/null; then
 if $(command_exists brew); then
     HOMEBREW_PREFIX="$(brew --prefix)"
 
     eval "$($HOMEBREW_PREFIX/bin/brew shellenv)"
-
-    augment_path "$HOMEBREW_PREFIX/bin"
 
     NVM="$HOMEBREW_PREFIX/opt/nvm"
     if [ -e "$NVM/nvm.sh" ]; then
