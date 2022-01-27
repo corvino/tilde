@@ -1,3 +1,5 @@
+SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 [ -z "$PS1" ] && return   # If not running interactively, don't do anything
 
 # Surround branch name in square brackets if in a git repo.
@@ -7,10 +9,6 @@ git_branch() {
     if [[ -n ${BRANCH} ]]; then
         echo "[${BRANCH}]"
     fi
-}
-
-dockerb() {
-    docker exec -it $1 /bin/bash
 }
 
 command_exists() {
@@ -26,23 +24,30 @@ path_contains() {
 }
 
 augment_path() {
-    if ! $(path_contains "$1"); then
-        PATH="$1:$PATH"
-    fi
+    IFS=":"
+    read -a dirs <<< "$1"
+    IFS=""
+
+    for dir in "${dirs[@]}"
+    do
+        if ! $(path_contains "$dir"); then
+            PATH="$dir:$PATH"
+        fi
+    done
 }
 
 NUM_COLORS=$(tput colors)
 
-if [ -n NUM_COLORS ]; then
-    case "$TERM" in
-        xterm* ) export PS1='\[\033[31;1m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[0;31m\]$(git_branch)\[\033[00m\]\$ ' ;;
-        *     ) export PS1='\u@\h:\w\$ ' ;;
-    esac
-
-    case "$TERM" in
-        xterm*|rxct* ) export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"' ;;
-    esac
-fi
+function prompt {
+    source "${SOURCE_DIR}/.bash_lib/colors.bash"
+    if [ -n NUM_COLORS ]; then
+        case "$TERM" in
+            xterm* ) echo "${a_red}\u@\h${df_clr}:${a_blue}\w${a_red}\$(git_branch)${df_clr}\$" ;;
+            *) echo ""
+        esac
+    fi
+}
+PS1=$(prompt)
 
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
 export HISTCONTROL=ignoredups
@@ -58,8 +63,6 @@ alias la="ls -a1"
 alias grpr='grep [Ee][Rr][Rr][Oo][Rr]'
 alias con="tail -40 -f /var/log/system.log"
 
-alias em="open -a Emacs"
-
 alias tag="ctags -e -R ."
 
 #
@@ -70,7 +73,6 @@ if [ -e /opt/homebrew/bin/brew ]; then
     augment_path /opt/homebrew/bin
 fi
 
-# if command -v brew &> /dev/null; then
 if $(command_exists brew); then
     HOMEBREW_PREFIX="$(brew --prefix)"
 
@@ -82,6 +84,12 @@ if $(command_exists brew); then
         [ -s "$NVM/nvm.sh" ] && . "$NVM/nvm.sh"  # This loads nvm
         [ -s "$NVM/etc/bash_completion.d/nvm" ] && . "$NVM/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
     fi
+
+    # asdf looks nice, but so far it has created problems running Electron in VSCode.
+    #
+    # if [ -e "$HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh" ]; then
+    #     . "$HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh"
+    # fi
 fi
 
 if $(command_exists rbenv); then
@@ -91,17 +99,27 @@ if $(command_exists pyenv); then
     eval "$(pyenv init -)"
 fi
 
+# Go
+
 export GOPATH=~/code/go
 alias goc='go build'
 alias got='go test $(go list ./... | grep -v /vendor/)'
 alias gotag="find . -type f -name '*.go' | xargs ctags -e"
 
+# Docker
+
 alias dks='docker stop $(docker ps -q)'
 alias dkl='docker logs -f $(docker ps -q)'
 
+dockerb() {
+    docker exec -it $1 /bin/bash
+}
+
+# Python
+
 alias ispark='PYSPARK_DRIVER_PYTHON=ipython pyspark'
 
-PATH=$PATH:~/bin:~/.binac
+augment_path ~/bin:~/.binac
 
 #
 # System-specific stuff.
@@ -128,10 +146,19 @@ if [[ $OSTYPE == "darwin"* ]]; then
     export JAVA_HOME=/Library/Java/Home
     export BASH_SILENCE_DEPRECATION_WARNING=1
 
-    alias emacsclient='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient'
-    alias code='"/Applications/Visual Studio Code.app//Contents/Resources/app/bin/code"'
-    alias mvi='open -a MacVim'
+    # Aliases for opening files in various applications
+
     alias mn=man_preview
+    alias em="open -a Emacs"
+    alias emc='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient'
+    alias mvi='open -a MacVim'
+
+    alias code='"/Applications/Visual Studio Code.app//Contents/Resources/app/bin/code"'
+
+    alias brave="open -a Brave\ Browser"
+    alias chromium="open -a Chromium"
+
+    alias fork="open -a Fork"
 
     INTELLIJ=`ls -1d /Applications/IntelliJ\ * 2>/dev/null | tail -n1`
     if [ -d "$INTELLIJ" ]; then
