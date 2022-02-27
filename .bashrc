@@ -101,6 +101,7 @@ if $(command_exists rbenv); then
     eval "$(rbenv init -)"
 fi
 if $(command_exists pyenv); then
+    augment_path "${HOME}/.pyenv/shims"
     eval "$(pyenv init -)"
 fi
 
@@ -122,6 +123,11 @@ dockerb() {
 
 # Python
 
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+alias venv-activate='source .venv/bin/activate'
+alias venv-show='if [ -n "${VIRTUAL_ENV+set}" ];
+    then echo $VIRTUAL_ENV
+fi'
 alias ispark='PYSPARK_DRIVER_PYTHON=ipython pyspark'
 
 augment_path ~/bin:~/.binac
