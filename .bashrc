@@ -76,6 +76,11 @@ fi
 if $(command_exists brew); then
     HOMEBREW_PREFIX="$(brew --prefix)"
 
+    # Use OpenJDK if homebrew has installed it.
+    if [ -d "${HOMEBREW_PREFIX}/opt/openjdk" ]; then
+        export JAVA_HOME="${HOMEBREW_PREFIX}/opt/openjdk"
+    fi
+
     eval "$($HOMEBREW_PREFIX/bin/brew shellenv)"
 
     NVM="$HOMEBREW_PREFIX/opt/nvm"
@@ -143,8 +148,11 @@ if [[ $OSTYPE == "darwin"* ]]; then
     PATH=/usr/local/smlnj/bin:$PATH
 
     export CLICOLOR=1
-    export JAVA_HOME=/Library/Java/Home
     export BASH_SILENCE_DEPRECATION_WARNING=1
+
+    if [ -z "${JAVA_HOME+set}" ]; then
+        export JAVA_HOME=/Library/Java/Home
+    fi
 
     # Aliases for opening files in various applications
 
