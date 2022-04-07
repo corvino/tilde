@@ -125,8 +125,12 @@ dockerb() {
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 alias venv-activate='source .venv/bin/activate'
-alias venv-show='if [ -n "${VIRTUAL_ENV+set}" ];
-    then echo $VIRTUAL_ENV
+alias venv-deactivate='if [ -n "${VIRTUAL_ENV+set}" ]; then
+    echo deactivating $VIRTUAL_ENV
+    deactivate
+fi'
+alias venv-show='if [ -n "${VIRTUAL_ENV+set}" ]; then
+    echo $VIRTUAL_ENV
 fi'
 alias ispark='PYSPARK_DRIVER_PYTHON=ipython pyspark'
 
