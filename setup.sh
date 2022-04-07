@@ -57,3 +57,5 @@ if [[ $OSTYPE == "darwin"* ]]; then
     ln -sfh ~/Library/Application\ Support/Code/User ~/vscode-settings
     ln -sfh ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/drive
 fi
+
+"${dir}/.lldb/compact-swift.py" > "${dir}/.lldb/commands-swift.lldb"

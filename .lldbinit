@@ -1,7 +1,7 @@
-command script import ~/.lldb/fsa.py
+command source ~/.lldb/commands-swift.lldb
 
-command regex pod 's/^(.+)$/expression -O -- [[NSString alloc] initWithData:%1 encoding:4]/' -h 'Print NSData converted to NSString.'
-command regex poj 's/^(.+)$/expression -O -- [NSJSONSerialization JSONObjectWithData:%1 options:0 error:nil]/' -h 'Print NSData converted to a JSON object.'
+command regex pod 's/^(.+)$/expression -O -- [[NSString alloc] initWithData:%1 encoding:4]/'
+command regex poj 's/^(.+)$/expression -O -- [NSJSONSerialization JSONObjectWithData:%1 options:0 error:nil]/'
 
 ### Reveal LLDB commands support - DO NOT MODIFY
 command script import /Users/vino/Library/Application\ Support/Reveal/RevealServerCommands.py
