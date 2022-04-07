@@ -44,7 +44,8 @@
                 standard-indent 4
                 tab-stop-list (number-sequence 4 120 4)
                 org-startup-indented t
-                org-startup-folded nil)
+                org-startup-folded nil
+                org-startup-truncated nil)
 (setq-default   tab-width 4
                 indent-tabs-mode nil
                 fill-column 72
