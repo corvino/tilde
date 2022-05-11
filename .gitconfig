@@ -44,6 +44,7 @@
     pusha = push -u --all
     pusht = push --tags
     pushb = push --set-upstream
+    fstpush = push --set-upstream origin main
 
     substats = "!f() { git-sub-stats.sh; }; f"
     ffbranch = "!f() { git-ff-branch.sh; }; f"

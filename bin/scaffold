@@ -1,0 +1,8 @@
+#! /usr/bin/env bash
+
+if [ ! -x "${HOME}/code/scaffolds/scaffold" ]; then
+    echo "scaffolding must be installed!"
+    exit 2
+fi
+
+"${HOME}/code/scaffolds/scaffold" "$@"
