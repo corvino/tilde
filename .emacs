@@ -1,7 +1,5 @@
 ;; -*- Mode: Emacs-Lisp; comment-column: 62 -*-
 ;; ==========================================================================
-;;
-;; Copyright © 1997-2016  Nathan Corvino
 
 (if (and (fboundp 'tool-bar-mode) tool-bar-mode) (tool-bar-mode 0))
 (if (and (fboundp 'scroll-bar-mode) scroll-bar-mode) (scroll-bar-mode nil))
@@ -26,6 +24,9 @@
 (add-to-list 'load-path "~/.elisp/markdown-mode")
 (add-to-list 'load-path "~/.elisp/slime")
 (add-to-list 'load-path "~/.elisp/swift-mode")
+
+(load-library "util.el")
+(load-library "time-log.el")
 
 ;; Set Variables.
 
@@ -108,6 +109,10 @@
 (global-set-key "\M-z" 'undo)
 (global-set-key [?\C-/] 'comment-region)
 (global-set-key [?\M-/] 'uncomment-region)
+
+;; Editing
+
+(global-set-key (kbd "C-S-s") 'query-replace)
 
 ;; Use \C-z as namespace for custom keybindings.
 
