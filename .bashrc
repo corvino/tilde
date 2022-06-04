@@ -60,7 +60,9 @@ alias ll="ls -lah"
 alias lq="ls -1"
 alias la="ls -a1"
 
+alias grep="grep -n --color=always"
 alias grpr='grep [Ee][Rr][Rr][Oo][Rr]'
+
 alias con="tail -40 -f /var/log/system.log"
 
 alias tag="ctags -e -R ."
