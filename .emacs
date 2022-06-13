@@ -119,10 +119,6 @@
 (global-set-key "\C-z" nil)
 (global-set-key "\C-zl" 'goto-line)
 (global-set-key [?\C-z backspace] 'revert-buffer)
-(global-set-key "\C-zk" 'compile)
-(global-set-key "\C-zd" 'gdb)
-(global-set-key "\C-zw" 'gdb-many-windows)
-(global-set-key "\C-ze" 'gdb-restore-windows)
 
 ;; etags
 
@@ -147,6 +143,7 @@
 (define-key global-map [(control ?z) ?s] 'de-pollinate)
 (define-key global-map [(control ?z) ?p] 'goto-matching-paren)
 (define-key global-map [(control ?z) ?o] 'browse-selected-file)
+(global-set-key "\C-za" 'open-in-brave)
 
 (fset 'yes-or-no-p 'y-or-n-p)
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode t))
