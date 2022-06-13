@@ -168,6 +168,8 @@ if [[ $OSTYPE == "darwin"* ]]; then
 
     # Aliases for opening files in various applications
 
+    alias lsregister=/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
+
     alias mn=man_preview
     alias em="open -a Emacs"
     alias emc='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient'
