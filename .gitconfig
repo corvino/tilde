@@ -46,6 +46,8 @@
     pushb = push --set-upstream
     fstpush = push --set-upstream origin main
 
+    regress = reset --hard HEAD^
+
     substats = "!f() { git-sub-stats.sh; }; f"
     ffbranch = "!f() { git-ff-branch.sh; }; f"
     recent = "!f() { git-recent.sh \"$1\"; }; f"
@@ -86,3 +88,6 @@
 [mergetool "sourcetree"]
     cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
     trustExitCode = true
+
+[status]
+	submodulesummary = true

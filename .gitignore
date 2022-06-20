@@ -1,1 +1,4 @@
 BACKUP
+.lldb/commands-swift.lldb
+.lldb/lldb-repl-widehistory
+.lldb/lldb-widehistory

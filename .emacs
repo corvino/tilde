@@ -1,6 +1,24 @@
 ;; -*- Mode: Emacs-Lisp; comment-column: 62 -*-
 ;; ==========================================================================
 
+
+;; Bootstrap straight.el
+;; https://github.com/radian-software/straight.el#bootstrapping-straightel
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'htmlize)
+
 (if (and (fboundp 'tool-bar-mode) tool-bar-mode) (tool-bar-mode 0))
 (if (and (fboundp 'scroll-bar-mode) scroll-bar-mode) (scroll-bar-mode nil))
 
@@ -8,22 +26,7 @@
   (setenv "PATH" (concat (mapconcat 'identity new-paths ":") ":" (getenv "PATH")))
   (setq exec-path (append new-paths exec-path)))
 
-(if (string-equal "darwin" (symbol-name system-type))
-    (let ((new-paths (list "/usr/local/bin" "/usr/local/smlnj/bin")))
-      (setenv "PATH" (concat (mapconcat 'identity new-paths ":") ":" (getenv "PATH")))
-      (setq exec-path (append new-paths exec-path))))
-
 (add-to-list 'load-path "~/.elisp")
-(add-to-list 'load-path "~/.elisp/csharp-mode")
-(add-to-list 'load-path "~/.elisp/direx-el")
-(add-to-list 'load-path "~/.elisp/go-mode")
-;(add-to-list 'load-path "~/.elisp/yaml-mode")
-;(add-to-list 'load-path "~/.elisp/graphql-mode")
-(add-to-list 'load-path "~/.elisp/emacs-request")
-(add-to-list 'load-path "~/.elisp/emacs-hcl-mode")
-(add-to-list 'load-path "~/.elisp/markdown-mode")
-(add-to-list 'load-path "~/.elisp/slime")
-(add-to-list 'load-path "~/.elisp/swift-mode")
 
 (load-library "util.el")
 (load-library "time-log.el")
@@ -122,7 +125,8 @@
 
 ;; etags
 
-(load-library "etags-select.el")
+;; etags-select has been removed because tags weren't being used, but
+;; would be worth investigating if a "return to tags" is made.
 
 ;; These got changed in emacs 25. Set them back to what they were
 ;; before. Maybe investigate at some point.
@@ -135,9 +139,6 @@
 (global-set-key (kbd "\C-z \C-f") 'tags-search)
 (global-set-key (kbd "\C-z \C-a") 'tags-apropos)
 
-(global-set-key [(control \;)] 'etags-select-find-tag-at-point)
-(global-set-key [(control \')] 'etags-select-find-tag)
-
 ;; Key bindings for custom functions.
 
 (define-key global-map [(control ?z) ?s] 'de-pollinate)
@@ -148,27 +149,6 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode t))
 
-;; (eval-after-load 'slime
-;;   `(define-key slime-prefix-map (kbd "C-c C-f") 'slime-eval-buffer))
-(require 'slime-autoloads)
-(add-hook 'slime-mode-hook
-          (lambda ()
-            (local-set-key (kbd "C-c C-f") 'slime-eval-buffer)))
-
-;; (require 'direx)
-;; ;; https://github.com/m2ym/direx-el
-;; ;; https://www.emacswiki.org/emacs/NeoTree
-;; ;; https://github.com/jaypei/emacs-neotree
-;; (add-hook 'dired-load-hook
-;;           (function (lambda  ()
-;;                       (define-key dired-mode-map "k" 'dired-kill-subdir)
-;;                       (define-key dired-mode-map "K" 'dired-do-kill-lines))))
-;; (global-set-key (kbd "C-x C-j") 'direx:jump-to-directory)
-;; (global-set-key (kbd "C-z C-j") 'direx:find-directory)
-;; (setq direx:leaf-icon "  "
-;;       direx:open-icon "▾ "
-;;       direx:closed-icon "▸ ")
-
 (add-hook 'org-mode-hook
           (lambda ()
             (local-set-key "\M-[" 'org-metaleft)
@@ -176,102 +156,6 @@
             (local-set-key "\M-p" 'org-metaup)
             (local-set-key "\M-n" 'org-metadown)
             ))
-
-;; Pretty diff mode
-
-(require 'diff-mode-)
-(autoload 'ediff-buffers "ediff" "Intelligent Emacs interface to diff" t)
-(autoload 'ediff-files "ediff" "Intelligent Emacs interface to diff" t)
-(autoload 'ediff-files-remote "ediff" "Intelligent Emacs interface to diff")
-
-;; Swift
-
-(autoload 'swift-mode "swift-mode" nil t)
-(add-to-list 'auto-mode-alist '("\\.swift\\'" . swift-mode))
-
-;; Apache
-
-(autoload 'apache-mode "apache-mode" nil t)
-(add-to-list 'auto-mode-alist '("\\.htaccess\\'"   . apache-mode))
-(add-to-list 'auto-mode-alist '("httpd\\.conf\\'"  . apache-mode))
-(add-to-list 'auto-mode-alist '("srm\\.conf\\'"    . apache-mode))
-(add-to-list 'auto-mode-alist '("access\\.conf\\'" . apache-mode))
-(add-to-list 'auto-mode-alist '("sites-\\(available\\|enabled\\)/" . apache-mode))
-
-;; Markdown
-
-(autoload 'markdown-mode "markdown-mode" "Major mode for editing Markdown files" t)
-(add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
-(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-
-(add-hook 'markdown-mode-hook (lambda () (when buffer-file-name (add-hook 'after-save-hook 'check-parens nil t))))
-(add-hook 'markdown-mode-hook (lambda () (modify-syntax-entry ?\" "\"" markdown-mode-syntax-table)))
-
-;; SML
-
-(autoload 'sml-mode "sml-mode" "Major mode for editing SML." t)
-(add-to-list 'auto-mode-alist '("\\.\\(sml\\|sig\\)\\'" . sml-mode))
-(add-hook 'sml-mode-hook
-          (lambda ()
-            (local-set-key "\C-zr" 'run-sml)))
-
-;; (defun sml-cmd-override ()
-;;   "Override sml--read-run-cmd to specify the sml command."
-;;   '("/usr/local/smlnj/bin/sml" "" ""))
-
-;; (add-hook 'sml-mode-hook
-;;           (lambda()
-;;             (defalias 'sml--read-run-cmd 'sml-cmd-override)))
-
-;; ;; Allow sml-run/run-sml before loading sml-mode.
-;; (defalias 'run-sml 'sml-run)
-;; (defun sml-run ()
-;;   "Load sml-mode and run sml-run with sml-cmd-override to avoid
-;; prompting for the sml command. sml-mode overrides this on load."
-;;   (interactive)
-;;   (load "sml-mode")
-;;   (apply 'sml-run (sml-cmd-override)))
-
-;; Go
-
-(require 'go-mode-autoloads)
-(setq gofmt-command "goimports")
-(add-hook 'go-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook 'gofmt-before-save)
-            (local-set-key (kbd "\C-zf") 'gofmt)))
-
-;; C#
-
-(autoload 'csharp-mode "csharp-mode" nil t)
-(add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
-
-;; YAML
-
-;;(require 'yaml-mode)
-;;(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-
-;; HCL
-
-;;(require 'hcl-mode)
-;;(add-to-list 'auto-mode-alist '("\\.tf\\'" . hcl-mode))
-
-;; GraphQL
-
-;; (require 'graphql-mode)
-;; (add-to-list 'auto-mode-alist '("\\.graphql\\'" . graphql-mode))
-
-;; Protocol Buffers
-
-(require 'cl)
-(autoload 'protobuf-mode "protobuf-mode" "Major mode for editing protocol buffers." t)
-(add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode))
-
-(defconst my-protobuf-style
-  '((c-basic-offset . 2)))
-(add-hook 'protobuf-mode-hook
-          (lambda () (c-add-style "my-style" my-protobuf-style t)))
 
 ;; Customize modes
 
@@ -395,3 +279,15 @@ current buffer's directory."
        (load-file x))
      (directory-files "~/.elispac" t ".el$")))
 (put 'downcase-region 'disabled nil)
+
+(defun delete-buffer-file ()
+  "Delete current buffer and file backing it."
+  (interactive)
+  (let ((file (buffer-file-name)))
+    (if (not file)
+        (message "No file backing buffer")
+      (if (y-or-n-p (format "Delete %s?" file))
+          (progn
+            (delete-file file)
+            (kill-buffer)
+            (message "Deleted file %s" file))))))
