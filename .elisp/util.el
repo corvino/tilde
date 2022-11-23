@@ -3,6 +3,10 @@
   (print object (get-buffer-create "*debug*"))
   (display-buffer "*debug*"))
 
+(defun lappend (element list)
+  "Return a new list with the specified element appended to list"
+  (reverse (cons element (reverse list))))
+
 (defun take-column (col list)
   "Take the col item of each list in list."
   (mapcar (apply-partially 'nth col) list))

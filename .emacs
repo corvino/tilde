@@ -30,6 +30,7 @@
 
 (load-library "util.el")
 (load-library "time-log.el")
+(load-library "org-config.el")
 
 ;; Set Variables.
 
@@ -49,7 +50,8 @@
                 tab-stop-list (number-sequence 4 120 4)
                 org-startup-indented t
                 org-startup-folded nil
-                org-startup-truncated nil)
+                org-startup-truncated nil
+                org-confirm-babel-evaluate nil)
 (setq-default   tab-width 4
                 indent-tabs-mode nil
                 fill-column 72

@@ -47,3 +47,10 @@ and output summary of (day project total-time tasks)."
                      (list day project time comments)))
                  projects)))
      days)))
+
+(defun tl-summary (log)
+    "Add a total column to the end of the summary."
+    (let* ((summary (time-log-summarize log))
+           (times (mapcar (apply-partially 'nth 3) log))
+           (total (list "Total" "" (tl-total times) "")))
+      (lappend total summary)))
