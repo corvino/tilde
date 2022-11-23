@@ -85,6 +85,8 @@ if $(command_exists brew); then
 
     eval "$($HOMEBREW_PREFIX/bin/brew shellenv)"
 
+    [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]] && . "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
+
     NVM="$HOMEBREW_PREFIX/opt/nvm"
     if [ -e "$NVM/nvm.sh" ]; then
         export NVM_DIR="$HOME/.nvm"
