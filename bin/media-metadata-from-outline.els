@@ -1,0 +1,107 @@
+#! /usr/bin/env emacs --script
+
+(require 'org-element)
+
+(defun org-link-extract-title ()
+  "Extract link from org-mode link and add it to kill ring."
+  ;; See ~/.elisp/util.el; can we load this?
+  (let* ((element (org-element-lineage (org-element-context) '(link) t))
+         (start (org-element-property :contents-begin element))
+         (end (org-element-property :contents-end element)))
+    (buffer-substring-no-properties start end)))
+
+(defun echo (output)
+  "Output argument to stdout with a newline appended."
+  (princ (format "%s\n" output)))
+
+(defun setup-buffer (buffer-name)
+  "Setup a buffer to read stdin into and switch to it for editing."
+  ;; https://gist.github.com/Kreyren/a12e3618525477c3dd5fb16c3de45bf3
+  ;; http://joelmccracken.github.io/entries/reading-writing-data-in-emacs-batch-via-stdin-stdout/
+
+  (let ((line)
+        (working-buffer (generate-new-buffer buffer-name)))
+    (while (setq line (ignore-errors (read-from-minibuffer "")))
+      (princ (format "%s\n" line) working-buffer))
+    working-buffer))
+
+(defun point-in-line ()
+  "Returns the position of the point in the current line."
+  (save-excursion
+    (let ((pnt (point)))
+      (beginning-of-line)
+      (- pnt (point)))))
+
+(defun fwd-line ()
+  "Advance a line, but if on the last line go to eol so that eobp will return t."
+  (end-of-line)
+  (if (< (point) (point-max))
+      (progn
+        (forward-line)
+        (beginning-of-line))))
+
+(defun beginning-of-line-pos ()
+  (save-excursion
+    (beginning-of-line)
+    (point)))
+
+(defun end-of-line-pos ()
+  (save-excursion
+    (end-of-line)
+    (point)))
+
+(defun org-link-strip-link ()
+    (let* ((context (org-element-context))
+           (type (org-element-type context))
+           (beg (org-element-property :begin context))
+           (end (org-element-property :end context)))
+      (when (eq type 'link)
+        (let ((title (org-link-extract-title)))
+          (kill-region beg end)
+          (insert title)))))
+
+(defun delink-words ()
+  "Replace org-mode links with just their titles until out of words."
+  (while (< (point) (point-max))
+    (org-link-strip-link)
+    (forward-word)))
+
+(defun process-1 ()
+  "Process column 1 outline items; set the section var and kill the line."
+  (setq outline-section (buffer-substring-no-properties (+ (point) 1) (line-end-position)))
+  (kill-whole-line))
+
+(defun process-3 ()
+   "Process column 3 outline items; strip links and leading goop, and insert section title."
+  (narrow-to-region (beginning-of-line-pos) (end-of-line-pos))
+
+  (delink-words)
+  (beginning-of-line)
+
+  (push-mark)
+  (if (re-search-forward "- [[:digit:]]+ - " (line-end-position) t)
+      (kill-region (mark) (point)))
+
+  (insert outline-section)
+  (insert ": ")
+
+  (widen)
+  (fwd-line))
+
+(defun process-line ()
+  (let ((indent-level (re-search-forward "-" (line-end-position) t)))
+    (cond ((= 1 (point-in-line)) (process-1))
+          ((= 3 (point-in-line)) (process-3))
+          (t (kill-whole-line)))))
+
+(defun process-toc ()
+  (beginning-of-buffer)
+  (while (< (point) (point-max))
+    (process-line)))
+
+(setq inhibit-message t)
+(defvar outline-section "")
+
+(switch-to-buffer (setup-buffer "working"))
+(process-toc)
+(princ (buffer-string))
