@@ -47,11 +47,7 @@
                 initial-scratch-message nil
                 inhibit-startup-message nil
                 standard-indent 4
-                tab-stop-list (number-sequence 4 120 4)
-                org-startup-indented t
-                org-startup-folded nil
-                org-startup-truncated nil
-                org-confirm-babel-evaluate nil)
+                tab-stop-list (number-sequence 4 120 4))
 (setq-default   tab-width 4
                 indent-tabs-mode nil
                 fill-column 72
@@ -150,14 +146,6 @@
 
 (fset 'yes-or-no-p 'y-or-n-p)
 (if (fboundp 'xterm-mouse-mode) (xterm-mouse-mode t))
-
-(add-hook 'org-mode-hook
-          (lambda ()
-            (local-set-key "\M-[" 'org-metaleft)
-            (local-set-key "\M-]" 'org-metaright)
-            (local-set-key "\M-p" 'org-metaup)
-            (local-set-key "\M-n" 'org-metadown)
-            ))
 
 ;; Customize modes
 
@@ -293,3 +281,4 @@ current buffer's directory."
             (delete-file file)
             (kill-buffer)
             (message "Deleted file %s" file))))))
+(put 'narrow-to-region 'disabled nil)
