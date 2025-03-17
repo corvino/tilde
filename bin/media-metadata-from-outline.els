@@ -66,12 +66,15 @@
     (org-link-strip-link)
     (forward-word)))
 
-(defun process-1 ()
+(defun process-section-name ()
   "Process column 1 outline items; set the section var and kill the line."
   (setq outline-section (buffer-substring-no-properties (+ (point) 1) (line-end-position)))
+  (setq section-num (+ 1 section-num))
+  (setq title-num 0)
+
   (kill-whole-line))
 
-(defun process-3 ()
+(defun process-line-to-title ()
    "Process column 3 outline items; strip links and leading goop, and insert section title."
   (narrow-to-region (beginning-of-line-pos) (end-of-line-pos))
 
@@ -88,19 +91,52 @@
   (widen)
   (fwd-line))
 
+(defun process-line-to-munge ()
+  (process-line-to-title)
+  ;; This is gross, but don't worry about it for now.
+  (previous-line)
+
+  (setq title-num (+ 1 title-num))
+
+  (narrow-to-region (beginning-of-line-pos) (end-of-line-pos))
+
+  (let* ((title (buffer-substring (beginning-of-line-pos) (end-of-line-pos))))
+    (kill-region (beginning-of-line-pos) (end-of-line-pos))
+    (insert (format "media-metadata-update.sh --title \"%s\" --TVSeasonNum %d --TVEpisodeNum %d --TVShowName \"%s\"" title section-num title-num heading))
+  )
+
+  (widen)
+  (fwd-line)
+  )
+
 (defun process-line ()
-  (let ((indent-level (re-search-forward "-" (line-end-position) t)))
-    (cond ((= 1 (point-in-line)) (process-1))
-          ((= 3 (point-in-line)) (process-3))
-          (t (kill-whole-line)))))
+  (cond ((re-search-forward "^\\*+\s" (line-end-position) t)
+         (if (= 2 (point-in-line))
+             (progn
+               ;; Trying to access the org-element-context in a header raises an error.
+               ;; This is worth figuring out.
+               (narrow-to-region (point) (end-of-line-pos))
+               (widen)
+               (kill-whole-line))))
+
+        ((re-search-forward "-" (line-end-position) t)
+          (cond
+           ((= 1 (point-in-line)) (process-section-name))
+           ((= 3 (point-in-line)) (process-line-to-munge))))
+
+        (t (kill-whole-line))))
 
 (defun process-toc ()
+  (setq heading (cadar (org-collect-keywords '("TITLE"))))
   (beginning-of-buffer)
   (while (< (point) (point-max))
     (process-line)))
 
 (setq inhibit-message t)
+(defvar heading "")
 (defvar outline-section "")
+(defvar section-num 0)
+(defvar title-num 0)
 
 (switch-to-buffer (setup-buffer "working"))
 (process-toc)
