@@ -1,0 +1,14 @@
+#! /usr/bin/env bash
+
+if [ 1 -ne "$#" ]; then
+    echo "usage: macos-app-sumary <output-dir>"
+    exit
+fi
+
+TARGET="$1"
+
+mkdir -p "${TARGET}"
+ls -1 /Applications > "${TARGET}"/applications.txt
+ls -l /Applications > "${TARGET}"/applications-details.txt
+brew list > "${TARGET}"/brew-list.txt
+echo $1
