@@ -11,7 +11,7 @@
 [core]
     excludesfile = ~/.gitexclude
     warnambiguousrefs = false
-    editor = emacs
+    editor = emacs -nw
 
 [alias]
     plog = log --pretty=format:'%h %ae %s' --graph

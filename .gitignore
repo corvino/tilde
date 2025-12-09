@@ -1,4 +1,9 @@
 BACKUP
+
+.emacs.d/**
+!.emacs.d/early-init.el
+!.emacs.d/elpaca.lock
+
 .lldb/commands-swift.lldb
 .lldb/lldb-repl-widehistory
 .lldb/lldb-widehistory
