@@ -32,3 +32,27 @@
 (org-link-set-parameters "vscode" :follow #'org-vscode-open)
 (org-link-set-parameters "xcode" :follow #'org-xcode-open)
 (org-link-set-parameters "intellij" :follow #'org-intellij-open)
+
+(defun org-link-strip-link ()
+    (let* ((context (org-element-context))
+           (type (org-element-type context))
+           (beg (org-element-property :begin context))
+           (end (org-element-property :end context)))
+      (when (eq type 'link)
+        (let ((title (org-link-extract-title)))
+          (kill-region beg end)
+          (insert title)))))
+
+(defun org-delink-all ()
+  "Replace org-mode links with just their titles until out of words."
+  (while (< (point) (point-max))
+    (org-link-strip-link)
+    (forward-word)))
+
+(defun org-link-strip ()
+  (interactive)
+  (save-excursion
+    (narrow-to-region (mark) (point))
+    (beginning-of-buffer)
+    (org-delink-all)
+    (widen)))

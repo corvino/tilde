@@ -7,20 +7,30 @@
   "Return a new list with the specified element appended to list"
   (reverse (cons element (reverse list))))
 
+(defun neq (a b)
+  "Not-eq."
+  (not (eq a b)))
+
 (defun take-column (col list)
   "Take the col item of each list in list."
   (mapcar (apply-partially 'nth col) list))
 
-(defun title-collapse ()
-  (interactive)
+(defun string-at-point ()
+  "Return the string surrounding the point using lisp syntax. Hopefully."
   (save-excursion
-    (search-backward "\"" nil nil)
-    (set-mark-command)
-    (search-forward "\"" nil nil)
-    (setq title  (buffer-substring (region-beginning) (region-end)))
-    (printd title)
-    )
-)
+    (backward-up-list 1 t t)
+    (push-mark)
+    (forward-char)
+    (up-list 1 t t)
+
+    (let* ((str (buffer-substring-no-properties (mark) (point)))
+           (len (length str)))
+      (if (>= 2 len)
+          (error "Unable to find string at point."))
+      (if (or (neq ?\" (aref str 0)) (neq ?\" (aref str (- len 1))))
+          (error "Unexpected string marker around point."))
+
+      (substring str 1 (- len 1)))))
 
 ;; Here is a few functions that build a "collapse and kill" interactive
 ;; function. The collapse is a transform that capitalizes all word
@@ -52,8 +62,7 @@
 
 (defun title-collapse ()
   (interactive)
-  (kill-new (replace-regexp-in-string " " "" (capitalize (string-from-quotes))))
-)
+  (kill-new (replace-regexp-in-string " " "" (capitalize (string-from-quotes)))))
 
 (global-set-key [f6] 'title-collapse)
 
