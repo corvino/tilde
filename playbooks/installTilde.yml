@@ -1,0 +1,13 @@
+---
+- name: Installs tilde confiration on remote host
+  hosts: all
+  tasks:
+    - name: Copy tilde to remote machine
+      become: no
+      synchronize:
+        src: ../../
+        dest: .tilde
+        delete: yes
+        recursive: yes
+    - name: Run setup to link files
+      shell: ./.tilde/setup.sh

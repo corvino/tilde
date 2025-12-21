@@ -1,0 +1,22 @@
+(org-link-set-parameters "iterm" :follow #'org-iterm-open)
+(org-link-set-parameters "vscode" :follow #'org-vscode-open)
+
+(defun org-app-open (app path)
+  (open-in-app app (expand-file-name path))
+)
+
+(defun org-iterm-open (path _)
+  (org-app-open "iTerm.app" path)
+)
+
+(defun org-vscode-open (path _)
+  (org-app-open "Visual Studio Code.app" )
+)
+
+(setq org-link-elisp-confirm-function (lambda (p) t))
+(closure (t) (p) t)
+
+
+org-link-shell-confirm-function
+(yes-or-no-p "hey")
+
