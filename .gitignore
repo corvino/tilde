@@ -1,9 +1,13 @@
+# https://git-scm.com/docs/gitignore
+
 BACKUP
 
-.emacs.d/**
-!.emacs.d/early-init.el
-!.emacs.d/elpaca.lock
+/.emacs.d/**
+/!.emacs.d/early-init.el
+/!.emacs.d/elpaca.lock
 
-.lldb/commands-swift.lldb
-.lldb/lldb-repl-widehistory
-.lldb/lldb-widehistory
+/.lldb/commands-swift.lldb
+/.lldb/lldb-repl-widehistory
+/.lldb/lldb-widehistory
+
+/.config/zed/prompts/**
