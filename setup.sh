@@ -54,7 +54,6 @@ done
 if [[ $OSTYPE == "darwin"* ]]; then
     echo "Creating symlinks for macOS"
 
-    ln -sfh ~/Library/Application\ Support/Code/User ~/vscode-settings
     ln -sfh ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/drive
 fi
 

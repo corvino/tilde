@@ -50,11 +50,6 @@
    (elpaca-write-lock-file (expand-file-name "~/.emacs.d/elpaca.lock"))
    (require 'ox-json)))
 
-;; (elpaca htmlize)
-;; (elpaca ox-json)
-
-;; (require 'ox-json)
-
 (if (and (fboundp 'tool-bar-mode) tool-bar-mode) (tool-bar-mode 0))
 (if (and (fboundp 'scroll-bar-mode) scroll-bar-mode) (scroll-bar-mode nil))
 
