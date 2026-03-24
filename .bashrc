@@ -75,6 +75,10 @@ if [ -e /opt/homebrew/bin/brew ]; then
     augment_path /opt/homebrew/bin
 fi
 
+if $(command_exists mise); then
+    eval "$(mise activate bash)"
+fi
+
 if $(command_exists brew); then
     HOMEBREW_PREFIX="$(brew --prefix)"
 
@@ -86,27 +90,6 @@ if $(command_exists brew); then
     eval "$($HOMEBREW_PREFIX/bin/brew shellenv)"
 
     [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]] && . "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
-
-    NVM="$HOMEBREW_PREFIX/opt/nvm"
-    if [ -e "$NVM/nvm.sh" ]; then
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM/nvm.sh" ] && . "$NVM/nvm.sh"  # This loads nvm
-        [ -s "$NVM/etc/bash_completion.d/nvm" ] && . "$NVM/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-    fi
-
-    # asdf looks nice, but so far it has created problems running Electron in VSCode.
-    #
-    # if [ -e "$HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh" ]; then
-    #     . "$HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh"
-    # fi
-fi
-
-if $(command_exists rbenv); then
-    eval "$(rbenv init -)"
-fi
-if $(command_exists pyenv); then
-    augment_path "${HOME}/.pyenv/shims"
-    eval "$(pyenv init -)"
 fi
 
 # Go
